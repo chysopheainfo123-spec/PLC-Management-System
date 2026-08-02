@@ -1,0 +1,10 @@
+{
+  "name": "PLC Computer School Management System 34",
+  "description": "Full-stack login system for the PLC Computer School Management System using Express, React, Tailwind CSS, and Prisma.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
