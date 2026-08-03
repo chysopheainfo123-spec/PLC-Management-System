@@ -1485,112 +1485,110 @@ export default function TimetableTab({
         )}
       </AnimatePresence>
 
-      {/* Control Filters & View Toggle Bar */}
-      <div className="bg-white p-4 sm:p-5 rounded-3xl border border-slate-100 shadow-sm space-y-4 relative z-30">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+      {/* Control Filters & View Toggle Bar (Single Row Layout) */}
+      <div className="bg-white p-3 sm:p-4 rounded-3xl border border-slate-100 shadow-sm relative z-30">
+        <div className="flex flex-nowrap items-center gap-3 overflow-x-auto pb-1 sm:pb-0 scrollbar-none w-full">
           
-          {/* Left View Mode Toggle Buttons */}
-          <div className="flex flex-wrap md:flex-nowrap items-center gap-3 w-full">
-            <div className="p-1 bg-slate-100/80 rounded-xl flex items-center shrink-0">
-              <button 
-                onClick={() => setViewMode("grid")}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  viewMode === "grid" 
-                    ? "bg-white text-blue-600 shadow-xs" 
-                    : "text-slate-500 hover:text-slate-800"
-                }`}
-              >
-                <LayoutGrid className="w-3.5 h-3.5" />
-                <span>{idt("ទិដ្ឋភាពប្រចាំសប្តាហ៍", "Weekly Grid")}</span>
-              </button>
-              <button 
-                onClick={() => setViewMode("matrix")}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  viewMode === "matrix" 
-                    ? "bg-white text-blue-600 shadow-xs" 
-                    : "text-slate-500 hover:text-slate-800"
-                }`}
-              >
-                <Calendar className="w-3.5 h-3.5" />
-                <span>{idt("តារាងម៉ោងសិក្សា", "Schedule Matrix")}</span>
-              </button>
-              <button 
-                onClick={() => setViewMode("list")}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  viewMode === "list" 
-                    ? "bg-white text-blue-600 shadow-xs" 
-                    : "text-slate-500 hover:text-slate-800"
-                }`}
-              >
-                <List className="w-3.5 h-3.5" />
-                <span>{idt("បញ្ជីកាលវិភាគ", "List Table")}</span>
-              </button>
-            </div>
-
-            {viewMode === "grid" && (
-              <div className="p-1 bg-blue-50/70 border border-blue-100/30 rounded-xl flex items-center animate-fadeIn shrink-0">
-                <span className="text-[10px] font-black text-blue-500 px-2.5 uppercase tracking-wider">{idt("តម្រៀបតាម៖", "Sort:")}</span>
-                <button 
-                  onClick={() => setGroupByMode("day")}
-                  className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all cursor-pointer ${
-                    groupByMode === "day" 
-                      ? "bg-blue-600 text-white shadow-2xs" 
-                      : "text-blue-600 hover:bg-blue-50/60"
-                  }`}
-                >
-                  {idt("ថ្ងៃសិក្សា", "Days")}
-                </button>
-                <button 
-                  onClick={() => setGroupByMode("room")}
-                  className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all cursor-pointer ${
-                    groupByMode === "room" 
-                      ? "bg-blue-600 text-white shadow-2xs" 
-                      : "text-blue-600 hover:bg-blue-50/60"
-                  }`}
-                >
-                  {idt("បន្ទប់", "Rooms")}
-                </button>
-                <button 
-                  onClick={() => setGroupByMode("teacher")}
-                  className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all cursor-pointer ${
-                    groupByMode === "teacher" 
-                      ? "bg-blue-600 text-white shadow-2xs" 
-                      : "text-blue-600 hover:bg-blue-50/60"
-                  }`}
-                >
-                  {idt("គ្រូបង្រៀន", "Teachers")}
-                </button>
-              </div>
-            )}
+          {/* View Mode Toggle Buttons */}
+          <div className="p-1 bg-slate-100/80 rounded-xl flex items-center shrink-0">
+            <button 
+              onClick={() => setViewMode("grid")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                viewMode === "grid" 
+                  ? "bg-white text-blue-600 shadow-xs" 
+                  : "text-slate-500 hover:text-slate-800"
+              }`}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span className="whitespace-nowrap">{idt("ទិដ្ឋភាពប្រចាំសប្តាហ៍", "Weekly Grid")}</span>
+            </button>
+            <button 
+              onClick={() => setViewMode("matrix")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                viewMode === "matrix" 
+                  ? "bg-white text-blue-600 shadow-xs" 
+                  : "text-slate-500 hover:text-slate-800"
+              }`}
+            >
+              <Calendar className="w-3.5 h-3.5" />
+              <span className="whitespace-nowrap">{idt("តារាងម៉ោងសិក្សា", "Schedule Matrix")}</span>
+            </button>
+            <button 
+              onClick={() => setViewMode("list")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                viewMode === "list" 
+                  ? "bg-white text-blue-600 shadow-xs" 
+                  : "text-slate-500 hover:text-slate-800"
+              }`}
+            >
+              <List className="w-3.5 h-3.5" />
+              <span className="whitespace-nowrap">{idt("បញ្ជីកាលវិភាគ", "List Table")}</span>
+            </button>
           </div>
-          
-          <div className="flex flex-row items-center gap-2 overflow-x-auto pb-1 scrollbar-none w-full">
-            {/* Action Buttons */}
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                onClick={handleExportExcel}
-                disabled={filteredTimetables.length === 0}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 h-9 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl border border-emerald-200/40 font-black text-xs transition-all cursor-pointer shadow-2xs active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
-                title={idt("ទាញយកជា Excel", "Export to Excel")}
+
+          {viewMode === "grid" && (
+            <div className="p-1 bg-blue-50/70 border border-blue-100/30 rounded-xl flex items-center animate-fadeIn shrink-0">
+              <span className="text-[10px] font-black text-blue-500 px-2 uppercase tracking-wider whitespace-nowrap">{idt("តម្រៀបតាម៖", "Sort:")}</span>
+              <button 
+                onClick={() => setGroupByMode("day")}
+                className={`px-2.5 py-1 rounded-lg text-[10px] font-black transition-all cursor-pointer whitespace-nowrap ${
+                  groupByMode === "day" 
+                    ? "bg-blue-600 text-white shadow-2xs" 
+                    : "text-blue-600 hover:bg-blue-50/60"
+                }`}
               >
-                <Download className="w-3.5 h-3.5" />
-                <span>{idt("ទាញយក Excel", "Export Excel")}</span>
+                {idt("ថ្ងៃសិក្សា", "Days")}
+              </button>
+              <button 
+                onClick={() => setGroupByMode("room")}
+                className={`px-2.5 py-1 rounded-lg text-[10px] font-black transition-all cursor-pointer whitespace-nowrap ${
+                  groupByMode === "room" 
+                    ? "bg-blue-600 text-white shadow-2xs" 
+                    : "text-blue-600 hover:bg-blue-50/60"
+                }`}
+              >
+                {idt("បន្ទប់", "Rooms")}
+              </button>
+              <button 
+                onClick={() => setGroupByMode("teacher")}
+                className={`px-2.5 py-1 rounded-lg text-[10px] font-black transition-all cursor-pointer whitespace-nowrap ${
+                  groupByMode === "teacher" 
+                    ? "bg-blue-600 text-white shadow-2xs" 
+                    : "text-blue-600 hover:bg-blue-50/60"
+                }`}
+              >
+                {idt("គ្រូបង្រៀន", "Teachers")}
               </button>
             </div>
+          )}
 
-            {/* Right Inputs & Search & Selects */}
-            <div className="flex flex-wrap items-center gap-3">
-              {/* Search Input */}
-              <div className="relative shrink-0">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
-                <input 
-                  type="text" 
-                  placeholder={idt("ស្វែងរកមុខវិជ្ជា/គ្រូ/បន្ទប់...", "Search subject/teacher/room...")} 
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9 pr-4 py-2 w-full min-w-[160px] sm:w-52 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-bold text-xs transition-all h-9"
-                />
-              </div>
+          {/* Vertical Separator */}
+          <div className="h-6 w-px bg-slate-200 shrink-0 hidden sm:block" />
+
+          {/* Action Buttons: Export Excel */}
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={handleExportExcel}
+              disabled={filteredTimetables.length === 0}
+              className="flex items-center gap-1.5 px-3 py-1.5 h-9 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl border border-emerald-200/40 font-black text-xs transition-all cursor-pointer shadow-2xs active:scale-95 disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap"
+              title={idt("ទាញយកជា Excel", "Export to Excel")}
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>{idt("ទាញយក Excel", "Export Excel")}</span>
+            </button>
+          </div>
+
+          {/* Search Input */}
+          <div className="relative shrink-0">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+            <input 
+              type="text" 
+              placeholder={idt("ស្វែងរកមុខវិជ្ជា/គ្រូ/បន្ទប់...", "Search subject/teacher/room...")} 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 pr-3 py-2 w-44 sm:w-52 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-bold text-xs transition-all h-9"
+            />
+          </div>
 
               {/* Filter by Day */}
               <div className="flex items-center gap-1 shrink-0">
@@ -1802,10 +1800,7 @@ export default function TimetableTab({
                   <X className="w-4 h-4" />
                 </button>
               )}
-            </div>
           </div>
-
-        </div>
 
         {/* Active Filter Badges */}
         {(searchTerm || selectedTeacherId || selectedDay || selectedRoom) && (

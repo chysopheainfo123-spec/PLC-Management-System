@@ -1,45 +1,15 @@
 import LanguageSelector from "./LanguageSelector";
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Lock, Eye, EyeOff, Loader2, AlertCircle, User, KeyRound, ShieldCheck, GraduationCap, Zap, CheckCircle2, Globe, Phone, MapPin, Info, Send, Sparkles, X, HeartHandshake, ArrowLeft, Mail, UserCheck, Star, ChevronRight, Cpu, Laptop, Code, Network, Database, Server } from 'lucide-react';
+import { Lock, Eye, EyeOff, Loader2, AlertCircle, User, KeyRound, ShieldCheck, GraduationCap, Zap, CheckCircle2, Globe, Phone, MapPin, Info, Send, Sparkles, X, HeartHandshake, ArrowLeft, Mail, UserCheck, Star, ChevronRight, ChevronLeft, Cpu, Laptop, Code, Network, Database, Server } from 'lucide-react';
 import { AuthResponse } from "../types";
 
 // Subtle Shadowy ICT / Technology Background Pattern Overlay with Full Area Stripes (ឆ្នួតៗ)
 const IctShadowyBackground = () => (
-  <div className="absolute inset-0 pointer-events-none overflow-hidden flex items-center justify-between px-3 text-white/80">
-    {/* Full Surface ICT Tech Diagonal Stripes & Matrix Grid SVG Background */}
-    <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        {/* Repeating 45-degree Tech Stripes Pattern */}
-        <pattern id="ictStripesPattern" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-          <line x1="0" y1="0" x2="0" y2="20" stroke="currentColor" strokeWidth="1.5" opacity="0.18" />
-          <line x1="10" y1="0" x2="10" y2="20" stroke="currentColor" strokeWidth="0.8" strokeDasharray="3 3" opacity="0.12" />
-        </pattern>
-        {/* Tech Grid / Matrix Dot Grid */}
-        <pattern id="ictGridPattern" width="30" height="30" patternUnits="userSpaceOnUse">
-          <path d="M 30 0 L 0 0 0 30" fill="none" stroke="currentColor" strokeWidth="0.6" strokeDasharray="2 2" opacity="0.2" />
-          <circle cx="30" cy="0" r="1.5" fill="currentColor" opacity="0.4" />
-        </pattern>
-      </defs>
-      {/* Full Area Pattern Fills */}
-      <rect width="100%" height="100%" fill="url(#ictGridPattern)" />
-      <rect width="100%" height="100%" fill="url(#ictStripesPattern)" />
-      
-      {/* Circuit Board Connecting Traces Across Surface */}
-      <path d="M 10 15 H 120 L 150 45 V 90 M 280 10 H 200 L 170 40 H 110 M 50 80 L 90 120 H 240" stroke="currentColor" strokeWidth="1.2" fill="none" strokeDasharray="4 3" opacity="0.3" />
-      <circle cx="150" cy="90" r="2.5" fill="currentColor" opacity="0.5" />
-      <circle cx="170" cy="40" r="2.5" fill="currentColor" opacity="0.5" />
-    </svg>
-
-    {/* Shadowy ICT Watermark Icons */}
-    <div className="relative z-0 w-full flex items-center justify-around gap-2 px-1 text-white/20">
-      <Cpu className="w-10 h-10 sm:w-11 sm:h-11 stroke-[1.4] drop-shadow-md" />
-      <Laptop className="w-9 h-9 sm:w-10 sm:h-10 stroke-[1.4] drop-shadow-md" />
-      <Code className="w-9 h-9 sm:w-10 sm:h-10 stroke-[1.4] drop-shadow-md" />
-      <Network className="w-9 h-9 sm:w-10 sm:h-10 stroke-[1.4] drop-shadow-md" />
-      <Database className="w-9 h-9 sm:w-10 sm:h-10 stroke-[1.4] drop-shadow-md" />
-      <Server className="w-9 h-9 sm:w-10 sm:h-10 stroke-[1.4] drop-shadow-md hidden sm:block" />
-    </div>
+  <div className="absolute inset-0 pointer-events-none overflow-hidden">
+    {/* Clean subtle ambient lighting glows */}
+    <div className="absolute -top-10 -left-10 w-44 h-44 bg-white/10 rounded-full blur-xl pointer-events-none" />
+    <div className="absolute -bottom-10 -right-10 w-44 h-44 bg-amber-300/10 rounded-full blur-xl pointer-events-none" />
   </div>
 );
 
@@ -356,7 +326,7 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
   const [sampleStudents, setSampleStudents] = useState<Array<{ phone: string; name: string; studentId: string; email?: string }>>([]);
 
   // Guardian / Student Portal Modal States
-  const [isPortalModalOpen, setIsPortalModalOpen] = useState(isParentUrl);
+  const [isPortalModalOpen, setIsPortalModalOpen] = useState(false);
   const [showGuardianForgotInfo, setShowGuardianForgotInfo] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
@@ -775,31 +745,35 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
         } else {
           throw new Error("Server returned non-JSON response");
         }
-      } catch (fetchErr) {
+      } catch (fetchErr: any) {
+        // If fetch returns an error thrown from non-ok response, re-throw it so the user sees the actual error message
+        if (fetchErr.message && !fetchErr.message.includes("Failed to fetch") && !fetchErr.message.includes("NetworkError")) {
+          throw fetchErr;
+        }
+
         console.warn("Backend offline/unreachable. Demo fallback...", fetchErr);
         
-        const cleanUsr = usr.trim().toLowerCase();
-        const cleanPsw = psw.trim().toLowerCase();
+        const rawUsr = usr.trim();
+        const rawPsw = psw.trim();
 
-        if (
-          (cleanUsr === "admin" && (cleanPsw === "admin123" || cleanPsw === "admin")) ||
-          (cleanUsr === "teacher" && cleanPsw === "teacher123") ||
-          (cleanUsr === "teacher@plc.com" && cleanPsw === "teacher123")
-        ) {
+        const isAdmin = (rawUsr === "admin" && (rawPsw === "admin123" || rawPsw === "admin")) || (rawUsr === "admin@plc.com" && (rawPsw === "admin123" || rawPsw === "admin"));
+        const isTeacher = (rawUsr === "teacher" && rawPsw === "teacher123") || (rawUsr === "teacher@plc.com" && rawPsw === "teacher123");
+
+        if (isAdmin || isTeacher) {
           isDemoMode = true;
-          const role = cleanUsr.includes("teacher") ? "TEACHER" : "ADMIN";
+          const role = isTeacher ? "TEACHER" : "ADMIN";
           data = {
             token: "demo_auth_token_bypass",
             user: {
               id: role === "ADMIN" ? "demo-admin" : "demo-teacher",
-              email: cleanUsr.includes("@") ? usr.trim() : (role === "ADMIN" ? "admin@plc.com" : "teacher@plc.com"),
+              email: rawUsr.includes("@") ? rawUsr : (role === "ADMIN" ? "admin@plc.com" : "teacher@plc.com"),
               name: role === "ADMIN" ? "Admin (Demo Mode)" : "Teacher (Demo Mode)",
               role: role
             }
           };
         } else {
           throw new Error(
-            lt("loginErrDefault") + "\n(ម៉ាស៊ីនមេក្រៅបណ្តាញ - Server is Offline. Please use demo accounts below.)"
+            "ឈ្មោះអ្នកប្រើប្រាស់/អ៊ីម៉ែល ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ! (សូមពិនិត្យមើលអក្សរធំ-តូច Case Sensitive)"
           );
         }
       }
@@ -831,8 +805,27 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loginMode === "student") {
-      if (!studentIdInput.trim()) return;
-      window.location.href = `/?portal_student=${encodeURIComponent(studentIdInput)}`;
+      const inputVal = studentIdInput.trim();
+      if (!inputVal) {
+        setError("សូមបញ្ចូលលេខសំគាល់សិស្ស ឬលេខទូរស័ព្ទអាណាព្យាបាល!");
+        return;
+      }
+      setIsLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`/api/portal/student/${encodeURIComponent(inputVal)}`);
+        const data = await res.json();
+        if (!res.ok || data.error) {
+          throw new Error(data.error || `រកមិនឃើញទិន្នន័យសិស្ស ឬអាណាព្យាបាលដែលមានលេខសំគាល់/លេខទូរស័ព្ទ (${inputVal}) ក្នុងប្រព័ន្ធជាក់ស្តែងឡើយ! សូមពិនិត្យឡើងវិញ ឬចុះឈ្មោះគណនីថ្មី។`);
+        }
+        setSuccessMsg("បានផ្ទៀងផ្ទាត់ទិន្នន័យពីប្រព័ន្ធជោគជ័យ! កំពុងចូលទៅកាន់ប្រព័ន្ធសិស្ស/អាណាព្យាបាល...");
+        setTimeout(() => {
+          window.location.href = `/?portal_student=${encodeURIComponent(data.studentId || data.id || inputVal)}`;
+        }, 600);
+      } catch (err: any) {
+        setError(err.message || "មានបញ្ហាក្នុងការស្វែងរកទិន្នន័យក្នុងប្រព័ន្ធ!");
+        setIsLoading(false);
+      }
       return;
     }
     if (!email.trim() || !password.trim()) {
@@ -844,21 +837,38 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
     await executeLogin(email, password);
   };
 
-  // Dedicated Forgot Password Screen matching the user's reference image
+  // Dedicated Forgot Password Screen matching the modern Login Form design
   if (isForgotPasswordOpen) {
     return (
-      <div className="min-h-screen w-full bg-slate-50 font-sans select-none flex flex-col justify-between items-center relative overflow-hidden pb-2">
-        {/* MAX WIDTH CONTAINER */}
-        <div className="w-full max-w-md mx-auto min-h-screen bg-white flex flex-col justify-between items-center shadow-xl relative overflow-hidden border-x border-slate-100">
-          
-          {/* 1. TOP DYNAMIC ARCHED HEADER BANNER */}
-          <div className={`w-full ${themeCfg.bannerBg} rounded-b-[45px] shadow-md relative overflow-hidden border-b-2 border-dashed border-amber-400 pt-3 pb-6 px-4 text-center transition-colors duration-300`}>
-            
-            {/* ICT Shadowy Background */}
-            <IctShadowyBackground />
+      <div className="min-h-screen w-full flex items-center justify-center bg-slate-100/80 p-3 sm:p-6 font-sans select-none relative overflow-hidden">
+        {/* Decorative Background Glows */}
+        <div className="absolute top-[-10%] left-[-10%] w-96 h-96 rounded-full bg-indigo-200/40 opacity-40 blur-3xl"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-blue-200/30 opacity-40 blur-3xl"></div>
 
-            {/* Top Control Bar with Back Arrow */}
-            <div className="relative z-20 flex items-center justify-between w-full mb-1">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="w-full max-w-md bg-white rounded-[32px] sm:rounded-[36px] shadow-2xl shadow-indigo-950/15 border border-slate-200/80 overflow-hidden z-10 relative flex flex-col justify-between"
+        >
+          {/* TOP MODERN GRADIENT HEADER BANNER WITH ABSTRACT WAVE ART */}
+          <div className="w-full bg-gradient-to-br from-[#2b337c] via-[#4352b2] to-[#5967cb] relative pt-4 pb-16 px-4 sm:px-5 border-b border-white/10">
+            
+            {/* Abstract Floating Circles & Wave Overlay */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-t-[32px] sm:rounded-t-[36px]">
+              <div className="absolute -left-10 -top-10 w-36 h-36 rounded-full bg-black/25 blur-2xs"></div>
+              <div className="absolute -right-8 -top-10 w-48 h-48 rounded-full bg-white/20 backdrop-blur-md"></div>
+              <div className="absolute right-6 top-8 w-28 h-28 rounded-full bg-white/25 shadow-inner"></div>
+              
+              {/* SVG Wave Lines Overlay */}
+              <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 400 200" fill="none">
+                <path d="M-50,120 C100,60 200,180 450,90 L450,200 L-50,200 Z" fill="white" fillOpacity="0.1" />
+                <path d="M-50,140 C120,80 250,190 450,110 L450,200 L-50,200 Z" fill="white" fillOpacity="0.15" />
+              </svg>
+            </div>
+
+            {/* Top Control Bar with Back Arrow & Language Selector */}
+            <div className="relative z-30 flex items-center justify-between w-full mb-3">
               <button
                 type="button"
                 onClick={() => {
@@ -867,557 +877,410 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
                   } else {
                     setIsForgotPasswordOpen(false);
                     if (forgotTarget === "student") {
-                      setIsPortalModalOpen(true);
                       setLoginMode("student");
                     } else {
                       setLoginMode("staff");
-                      setIsPortalModalOpen(false);
                     }
                   }
                 }}
-                className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer active:scale-95"
+                className="p-1.5 rounded-full bg-black/30 hover:bg-black/50 text-white transition-all cursor-pointer active:scale-95 border border-white/15"
                 title="ត្រឡប់ក្រោយ"
               >
-                <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
+                <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
               </button>
 
-              {/* Cambodian Flag Icon Pill Button */}
-              <div className="w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center border border-slate-200">
-                <img 
-                  src="https://flagcdn.com/w40/kh.png" 
-                  alt="Cambodia Flag" 
-                  className="w-5 h-3.5 object-cover rounded-xs"
-                />
-              </div>
+              {/* Clean Integrated Language Selector */}
+              <LanguageSelector className="flex items-center" />
             </div>
 
-            {/* SCHOOL LOGO SEAL CONTAINER */}
-            <div className="relative z-10 my-1">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.3 }}
-                className="w-22 h-22 sm:w-24 sm:h-24 rounded-full bg-white border-[3.5px] border-[#f0ab22] shadow-xl mx-auto flex items-center justify-center p-1.5 relative"
-              >
-                {schoolLogo ? (
-                  <img src={schoolLogo} alt="School Logo" className="w-full h-full object-contain rounded-full" />
-                ) : (
-                  <div className="w-full h-full rounded-full bg-[#0a0f1d] flex flex-col items-center justify-center text-white p-1 text-center border border-amber-300">
-                    <svg className="w-10 h-10 text-amber-300 mb-0.5" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    <span className="text-[7.5px] font-black uppercase tracking-tighter leading-none text-amber-200">
-                      PLC
-                    </span>
-                  </div>
-                )}
-              </motion.div>
+            {/* WELCOME BADGE HEADER TEXT */}
+            <div className="relative z-10 flex items-center justify-center gap-2 max-w-sm mx-auto mt-1 py-1 text-white">
+              <ShieldCheck className="w-4.5 h-4.5 text-amber-300 shrink-0" />
+              <span className="text-sm font-black tracking-wide truncate">
+                {forgotTarget === "student" ? "ស្វែងរកគណនី / កំណត់ពាក្យសម្ងាត់" : "កំណត់ពាក្យសម្ងាត់ Admin / គ្រូ"}
+              </span>
             </div>
-
-            {/* SCHOOL NAME TYPOGRAPHY */}
-            <motion.div
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              className="relative z-10 mt-2"
-            >
-              <h1 className="text-xl sm:text-2xl font-black text-white tracking-wide font-serif leading-tight">
-                {schoolKhmerName || "សាលាកុំព្យូទ័រ ភីអិលស៊ី"}
-              </h1>
-              <p className="text-base sm:text-lg font-bold text-amber-200 font-serif italic tracking-wider mt-0.5 opacity-95">
-                {schoolName || "PLC Computer School"}
-              </p>
-            </motion.div>
           </div>
 
-          {/* 2. MIDDLE CONTENT SECTION MATCHING SCREENSHOT EXACTLY */}
-          <div className="w-full px-6 sm:px-8 py-4 flex flex-col items-center text-center flex-1 justify-center max-w-sm mx-auto my-auto space-y-4">
-            
-            {/* SLOGAN WITH BRUSH UNDERLINE */}
-            <div className="flex flex-col items-center">
-              <h2 className="text-[#1e3a8a] font-black text-base sm:text-lg font-battambang tracking-tight">
-                សិក្សាបច្ចេកវិទ្យាឌីជីថល ដើម្បីភាពរីកចម្រើនទៅមុខ
-              </h2>
-              <div className="flex items-center justify-center gap-1.5 mt-1 text-amber-500">
-                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
-                <Star className="w-4 h-4 fill-amber-400 text-amber-500" />
-                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
+          {/* OVERLAPPING WHITE CONTENT SHEET WITH BIG ROUNDED CORNERS */}
+          <div className="-mt-10 relative z-20 bg-white rounded-t-[32px] sm:rounded-t-[36px] px-6 sm:px-8 pt-7 pb-6 flex-1 flex flex-col justify-between">
+            <div>
+              {/* SCHOOL HEADING */}
+              <div className="text-center mb-4">
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-[#4352b2] tracking-tight">
+                  {uiLang === 'en' ? 'PLC Computer School' : 'សាលាកុំព្យូទ័រ ភី អិល ស៊ី'}
+                </h1>
               </div>
-            </div>
 
-            {/* MAIN TITLE & SUBTITLE */}
-            <div className="space-y-1">
-              <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${forgotTarget === 'student' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'}`}>
-                {forgotTarget === "student" ? "សិស្ស & អាណាព្យាបាល (Student Portal)" : "អ្នកគ្រប់គ្រងប្រព័ន្ធ, គ្រូ & បុគ្គលិក (Admin & Staff)"}
-              </span>
-              <h3 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">
-                {forgotTarget === "student" ? "ស្វែងរកគណនី ឬកំណត់ពាក្យសម្ងាត់" : "ស្នើសុំកំណត់ពាក្យសម្ងាត់ Admin / គ្រូ"}
-              </h3>
-              <p className="text-xs text-slate-500 font-medium leading-relaxed px-2">
-                {forgotTarget === "student"
-                  ? "សូមជ្រើសរើសវិធីសាស្ត្រស្វែងរកគណនីខាងក្រោម៖"
-                  : "សូមទំនាក់ទំនងទៅកាន់អ្នកគ្រប់គ្រងប្រព័ន្ធ (Admin) តាមរយៈ Telegram ឬលេខទូរស័ព្ទខាងក្រោម៖"}
-              </p>
-            </div>
+              {/* SLOGAN & INSTRUCTION */}
+              <div className="flex flex-col items-center mb-5 text-center">
+                <h2 className="text-[#1e3a8a] font-black text-sm sm:text-base font-battambang tracking-tight">
+                  ស្វែងរកគណនី ឬកំណត់ពាក្យសម្ងាត់
+                </h2>
+                <div className="flex items-center justify-center gap-1.5 mt-1 mb-1 text-amber-500">
+                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
+                  <Star className="w-4 h-4 fill-amber-400 text-amber-500" />
+                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
+                </div>
+                <p className="text-xs text-slate-500 font-bold leading-relaxed px-2">
+                  {forgotTarget === "student"
+                    ? "សូមជ្រើសរើសវិធីសាស្ត្រស្វែងរកគណនីខាងក្រោម៖"
+                    : "សូមទំនាក់ទំនងទៅកាន់អ្នកគ្រប់គ្រងប្រព័ន្ធ (Admin) តាមរយៈ Telegram ឬលេខទូរស័ព្ទខាងក្រោម៖"}
+                </p>
+              </div>
 
-            {/* FORGOT PASSWORD SELECT STEP */}
-            {forgotStep === "select" && (
-              <div className="w-full space-y-3.5 pt-1">
-                {forgotTarget === "student" ? (
-                  /* --- GUARDIAN / STUDENT PILL BUTTONS (MATCHING SCHOOL MANAGEMENT SYSTEM THEME) --- */
-                  <div className="w-full space-y-3 pt-1">
-                    {/* 1. BY PHONE BUTTON (AMBER / GOLD) */}
-                    <button
-                      type="button"
-                      onClick={() => handleSelectForgotMethod("phone")}
-                      className="group relative w-full py-3.5 px-5 rounded-full bg-amber-600 hover:bg-amber-700 active:scale-[0.98] text-white font-black text-sm sm:text-base tracking-wide shadow-md shadow-amber-500/20 hover:shadow-lg hover:shadow-amber-500/30 border border-amber-300/40 transition-all duration-200 flex items-center justify-between cursor-pointer overflow-hidden"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-xs ring-1 ring-white/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200">
-                          <Phone className="w-4 h-4 text-white stroke-[2.5]" />
-                        </div>
-                        <span className="drop-shadow-xs">តាមទូរស័ព្ទ</span>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-white/80 group-hover:text-white group-hover:translate-x-1 transition-all duration-200" />
-                    </button>
-
-                    {/* 2. BY EMAIL BUTTON (ROSE / CRIMSON) */}
-                    <button
-                      type="button"
-                      onClick={() => handleSelectForgotMethod("email")}
-                      className="group relative w-full py-3.5 px-5 rounded-full bg-rose-800 hover:bg-rose-900 active:scale-[0.98] text-white font-black text-sm sm:text-base tracking-wide shadow-md shadow-rose-900/20 hover:shadow-lg hover:shadow-rose-900/30 border border-rose-400/40 transition-all duration-200 flex items-center justify-between cursor-pointer overflow-hidden"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-xs ring-1 ring-white/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200">
-                          <Mail className="w-4 h-4 text-white stroke-[2.5]" />
-                        </div>
-                        <span className="drop-shadow-xs">តាមអ៊ីម៉ែល</span>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-white/80 group-hover:text-white group-hover:translate-x-1 transition-all duration-200" />
-                    </button>
-
-                    {/* DIVIDER LINE WITH ELEGANT BADGE */}
-                    <div className="flex items-center my-3 gap-3 text-slate-300 w-full px-1">
-                      <div className="h-[1px] flex-1 bg-slate-200" />
-                      <span className="text-[11px] font-bold text-slate-500 tracking-tight whitespace-nowrap px-3 py-1 rounded-full bg-slate-100/90 border border-slate-200/80 shadow-2xs">
-                        ជម្រើសនេះគឺសម្រាប់តែសិស្សប៉ុណ្ណោះ
-                      </span>
-                      <div className="h-[1px] flex-1 bg-slate-200" />
-                    </div>
-
-                    {/* 3. STUDENT ID BUTTON (BLUE) */}
-                    <button
-                      type="button"
-                      onClick={() => handleSelectForgotMethod("student_id")}
-                      className="group relative w-full py-3.5 px-5 rounded-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-black text-sm sm:text-base tracking-wide shadow-md shadow-sky-600/20 hover:shadow-lg hover:shadow-sky-600/30 border border-sky-300/40 transition-all duration-200 flex items-center justify-between cursor-pointer overflow-hidden"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-xs ring-1 ring-white/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200">
-                          <UserCheck className="w-4 h-4 text-white stroke-[2.5]" />
-                        </div>
-                        <span className="drop-shadow-xs">លេខសំគាល់សិស្ស</span>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-white/80 group-hover:text-white group-hover:translate-x-1 transition-all duration-200" />
-                    </button>
-                  </div>
-                ) : (
-                  /* --- ADMIN / STAFF FORGOT PASSWORD FLOW --- */
-                  <>
-                    {/* 1. ADMIN TELEGRAM DIRECT LINK */}
-                    <motion.a
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.97 }}
-                      href={
-                        schoolTelegram
-                          ? schoolTelegram.startsWith("http")
-                            ? schoolTelegram
-                            : `https://t.me/${schoolTelegram.replace("@", "").trim()}?text=${encodeURIComponent("ជម្រាបសួរអ្នកគ្រប់គ្រងប្រព័ន្ធ! ខ្ញុំបាទ/នាងខ្ញុំសូមស្នើសុំកំណត់ពាក្យសម្ងាត់ឡើងវិញ។")}`
-                          : developerTelegram || "https://t.me/plccomputerschool"
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full p-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-sky-500/20 border border-sky-300/30 transition-all flex items-center justify-between gap-3 cursor-pointer group text-left"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-11 h-11 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 text-white group-hover:scale-110 transition-transform">
-                          <Send className="w-6 h-6 stroke-[2.2]" />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-[10px] font-bold text-sky-100 uppercase tracking-wider">ស្នើសុំតាម TELEGRAM</div>
-                          <div className="text-sm sm:text-base font-black tracking-tight truncate drop-shadow-3xs">
-                            {schoolTelegram
-                              ? schoolTelegram.startsWith("http")
-                                ? schoolTelegram
-                                : `https://t.me/${schoolTelegram.replace("@", "").trim()}`
-                              : "https://t.me/plccomputerschool"}
+              {/* FORGOT PASSWORD SELECT STEP */}
+              {forgotStep === "select" && (
+                <div className="w-full space-y-3 pt-1">
+                  {forgotTarget === "student" ? (
+                    /* GUARDIAN / STUDENT PILL BUTTONS */
+                    <div className="w-full space-y-3">
+                      {/* 1. BY PHONE BUTTON (WARM AMBER / ORANGE) */}
+                      <button
+                        type="button"
+                        onClick={() => handleSelectForgotMethod("phone")}
+                        className="group relative w-full py-3.5 px-5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 active:scale-[0.98] text-white font-black text-sm sm:text-base tracking-wide shadow-md shadow-amber-500/25 border border-amber-300/40 transition-all duration-200 flex items-center justify-between cursor-pointer overflow-hidden"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-xs ring-1 ring-white/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200">
+                            <Phone className="w-4 h-4 text-white stroke-[2.5]" />
                           </div>
-                          <div className="text-[10.5px] text-sky-100/90 font-medium">ផ្ញើសារផ្ទាល់ទៅកាន់ Admin</div>
+                          <span className="drop-shadow-xs">តាមទូរស័ព្ទ</span>
                         </div>
-                      </div>
-                      <div className="px-3 py-1.5 rounded-full bg-white text-sky-700 text-xs font-black shrink-0 shadow-xs group-hover:bg-amber-300 group-hover:text-slate-900 transition-colors">
-                        ផ្ញើសារ ✈️
-                      </div>
-                    </motion.a>
+                        <ChevronRight className="w-5 h-5 text-white/80 group-hover:text-white group-hover:translate-x-1 transition-all duration-200" />
+                      </button>
 
-                    {/* 2. ADMIN & STAFF PHONE NUMBERS DIRECT CALL */}
-                    <div className="w-full p-4 rounded-2xl bg-amber-50/90 border border-amber-200/90 text-left space-y-2.5 shadow-xs">
-                      <div className="flex items-center gap-2.5 text-amber-900">
-                        <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
-                          <Phone className="w-5 h-5 stroke-[2.2]" />
+                      {/* 2. BY EMAIL BUTTON (SOFT CORAL / ROSE) */}
+                      <button
+                        type="button"
+                        onClick={() => handleSelectForgotMethod("email")}
+                        className="group relative w-full py-3.5 px-5 rounded-full bg-gradient-to-r from-rose-500 to-red-500 hover:from-rose-600 hover:to-red-600 active:scale-[0.98] text-white font-black text-sm sm:text-base tracking-wide shadow-md shadow-rose-500/25 border border-rose-300/40 transition-all duration-200 flex items-center justify-between cursor-pointer overflow-hidden"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-xs ring-1 ring-white/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200">
+                            <Mail className="w-4 h-4 text-white stroke-[2.5]" />
+                          </div>
+                          <span className="drop-shadow-xs">តាមអ៊ីម៉ែល</span>
                         </div>
-                        <div>
-                          <div className="text-[10px] font-bold uppercase tracking-wider text-amber-700">លេខទូរស័ព្ទអ្នកគ្រប់គ្រងប្រព័ន្ធ / រដ្ឋបាល</div>
-                          <div className="text-xs font-black text-amber-950">ទំនាក់ទំនងផ្ទាល់តាមទូរស័ព្ទ</div>
-                        </div>
+                        <ChevronRight className="w-5 h-5 text-white/80 group-hover:text-white group-hover:translate-x-1 transition-all duration-200" />
+                      </button>
+
+                      {/* DIVIDER LINE WITH BADGE */}
+                      <div className="flex items-center my-3 gap-3 text-slate-300 w-full px-1">
+                        <div className="h-[1px] flex-1 bg-slate-200" />
+                        <span className="text-[11px] font-bold text-slate-500 tracking-tight whitespace-nowrap px-3 py-1 rounded-full bg-slate-100 border border-slate-200">
+                          ជម្រើសនេះគឺសម្រាប់តែសិស្សប៉ុណ្ណោះ
+                        </span>
+                        <div className="h-[1px] flex-1 bg-slate-200" />
                       </div>
 
-                      {/* PHONE NUMBERS LIST FROM REAL DYNAMIC SETTINGS */}
-                      <div className="grid grid-cols-1 gap-2 pt-1">
-                        {Array.from(
-                          new Set(
-                            [
-                              ...(schoolPhone || "087 850 014 / 097 501 3648").split("/"),
-                              developerPhone || ""
-                            ]
-                              .map((p) => p.trim())
-                              .filter(Boolean)
-                          )
-                        ).map((phoneNum, idx) => {
-                          const telHref = `tel:${phoneNum.replace(/\s+/g, "")}`;
-                          return (
-                            <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-white border border-amber-200/70 shadow-3xs">
-                              <div className="flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                                <span className="text-xs sm:text-sm font-black text-slate-800 tracking-wide font-mono">📞 {phoneNum}</span>
-                              </div>
-                              <a
-                                href={telHref}
-                                className="px-3 py-1 rounded-full bg-amber-500 hover:bg-amber-600 text-white text-xs font-black transition-colors shadow-xs active:scale-95"
-                              >
-                                ហៅចេញ
-                              </a>
-                            </div>
-                          );
-                        })}
-                      </div>
+                      {/* 3. STUDENT ID BUTTON (SOFT INDIGO / BLUE) */}
+                      <button
+                        type="button"
+                        onClick={() => handleSelectForgotMethod("student_id")}
+                        className="group relative w-full py-3.5 px-5 rounded-full bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 active:scale-[0.98] text-white font-black text-sm sm:text-base tracking-wide shadow-md shadow-indigo-500/25 border border-indigo-300/40 transition-all duration-200 flex items-center justify-between cursor-pointer overflow-hidden"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-xs ring-1 ring-white/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200">
+                            <UserCheck className="w-4 h-4 text-white stroke-[2.5]" />
+                          </div>
+                          <span className="drop-shadow-xs">លេខសំគាល់សិស្ស</span>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-white/80 group-hover:text-white group-hover:translate-x-1 transition-all duration-200" />
+                      </button>
                     </div>
-                  </>
-                )}
-              </div>
-            )}
-
-            {/* INPUT / SEARCH STEP ("input") */}
-            {forgotStep === "input" && (
-              <form onSubmit={handleForgotSearchSubmit} className="w-full space-y-3.5 pt-1 text-left">
-                <div className="space-y-1">
-                  <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
-                    {forgotMethod === "phone" ? "ផ្លាស់ប្ដូរពាក្យសម្ងាត់ដោយប្រើលេខទូរស័ព្ទ" :
-                     forgotMethod === "email" ? "ផ្លាស់ប្ដូរពាក្យសម្ងាត់ដោយប្រើអ៊ីម៉ែល" :
-                     "ផ្លាស់ប្ដូរពាក្យសម្ងាត់ដោយប្រើអត្តលេខ / ID"}
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={forgotQuery}
-                      onChange={(e) => setForgotQuery(e.target.value)}
-                      placeholder={
-                        forgotMethod === "phone" ? (forgotTarget === "student" ? "ឧ. 012345678, 098765432" : "ឧ. 012345678, 012888999") :
-                        forgotMethod === "email" ? (forgotTarget === "student" ? "ឧ. plc001@plc.edu.kh, student@plc.com" : "ឧ. admin@plc.com, plc001@plc.edu.kh") :
-                        (forgotTarget === "student" ? "ឧ. PLC-001, PLC-002" : "ឧ. admin, PLC-T01, PLC-001")
-                      }
-                      autoFocus
-                      required
-                      className={`w-full pl-4 pr-10 py-3 rounded-2xl border-2 border-slate-300 bg-white text-slate-800 text-xs sm:text-sm font-bold focus:outline-none ${themeCfg.focusRing} focus:ring-2 transition-all`}
-                    />
-                  </div>
-                </div>
-
-                {/* Quick Presets with Real Data */}
-                <div className="bg-slate-50 p-2.5 rounded-2xl border border-slate-100">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-1">
-                    គំរូទិន្នន័យជាក់ស្ដែង៖
-                  </span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {forgotMethod === "student_id" && (
-                      <>
-                        {forgotTarget !== "student" && (
-                          <>
-                            <button type="button" onClick={() => setForgotQuery("admin")} className="px-2 py-1 bg-white border border-blue-200 text-blue-700 rounded-lg text-[10px] font-bold shadow-2xs hover:bg-slate-50 transition-colors">Admin (admin)</button>
-                            <button type="button" onClick={() => setForgotQuery("PLC-T01")} className="px-2 py-1 bg-white border border-blue-200 text-blue-700 rounded-lg text-[10px] font-bold shadow-2xs hover:bg-slate-50 transition-colors">PLC-T01 (លោកគ្រូ វឌ្ឍនា)</button>
-                            <button type="button" onClick={() => setForgotQuery("PLC-T02")} className="px-2 py-1 bg-white border border-pink-200 text-pink-700 rounded-lg text-[10px] font-bold shadow-2xs hover:bg-slate-50 transition-colors">PLC-T02 (អ្នកគ្រូ ម៉ារីណា)</button>
-                          </>
-                        )}
-                        {sampleStudents && sampleStudents.length > 0 ? (
-                          sampleStudents.map((st, idx) => {
-                            const colors = [
-                              "border-blue-200 text-blue-700",
-                              "border-emerald-200 text-emerald-700",
-                              "border-blue-200 text-blue-700",
-                              "border-amber-200 text-amber-700"
-                            ];
-                            const style = colors[idx % colors.length];
-                            return (
-                              <button
-                                key={(st.studentId || "st-id") + "-" + idx}
-                                type="button"
-                                onClick={() => setForgotQuery(st.studentId)}
-                                className={`px-2 py-1 bg-white border ${style} rounded-lg text-[10px] font-bold shadow-2xs hover:bg-slate-50 transition-colors`}
-                              >
-                                {st.studentId} ({st.name || "សិស្ស"})
-                              </button>
-                            );
-                          })
-                        ) : (
-                          <>
-                            <button type="button" onClick={() => setForgotQuery("PLC-001")} className="px-2 py-1 bg-white border border-blue-200 text-blue-700 rounded-lg text-[10px] font-bold shadow-2xs hover:bg-slate-50 transition-colors">PLC-001 (សិស្ស)</button>
-                            <button type="button" onClick={() => setForgotQuery("PLC-002")} className="px-2 py-1 bg-white border border-emerald-200 text-emerald-700 rounded-lg text-[10px] font-bold shadow-2xs hover:bg-slate-50 transition-colors">PLC-002 (សិស្ស)</button>
-                          </>
-                        )}
-                      </>
-                    )}
-                    {forgotMethod === "phone" && (
-                      <>
-                        {sampleStudents && sampleStudents.length > 0 ? (
-                          sampleStudents.map((st, idx) => {
-                            const colors = [
-                              "border-blue-200 text-blue-700",
-                              "border-pink-200 text-pink-700",
-                              "border-blue-200 text-blue-700",
-                              "border-emerald-200 text-emerald-700",
-                              "border-blue-200 text-blue-700"
-                            ];
-                            const style = colors[idx % colors.length];
-                            return (
-                              <button
-                                key={(st.studentId || "st") + "-" + idx}
-                                type="button"
-                                onClick={() => setForgotQuery(st.phone)}
-                                className={`px-2 py-1 bg-white border ${style} rounded-lg text-[10px] font-bold shadow-2xs hover:bg-slate-50 transition-colors`}
-                              >
-                                {st.phone} (សិស្ស)
-                              </button>
-                            );
-                          })
-                        ) : (
-                          <>
-                            <button type="button" onClick={() => setForgotQuery("012345678")} className="px-2 py-1 bg-white border border-blue-200 text-blue-700 rounded-lg text-[10px] font-bold shadow-2xs">012345678 (សិស្ស)</button>
-                            <button type="button" onClick={() => setForgotQuery("098765432")} className="px-2 py-1 bg-white border border-blue-200 text-blue-700 rounded-lg text-[10px] font-bold shadow-2xs">098765432 (សិស្ស)</button>
-                          </>
-                        )}
-                      </>
-                    )}
-                    {forgotMethod === "email" && (
-                      <>
-                        {forgotTarget !== "student" && (
-                          <button type="button" onClick={() => setForgotQuery("admin@plc.com")} className="px-2 py-1 bg-white border border-blue-200 text-blue-700 rounded-lg text-[10px] font-bold shadow-2xs hover:bg-slate-50 transition-colors">admin@plc.com</button>
-                        )}
-                        {sampleStudents && sampleStudents.length > 0 ? (
-                          sampleStudents.map((st, idx) => {
-                            const studentEmail = st.email || `${st.studentId.toLowerCase()}@plc.edu.kh`;
-                            const colors = [
-                              "border-sky-200 text-sky-700",
-                              "border-pink-200 text-pink-700",
-                              "border-emerald-200 text-emerald-700",
-                              "border-blue-200 text-blue-700"
-                            ];
-                            const style = colors[idx % colors.length];
-                            return (
-                              <button
-                                key={(st.studentId || "st-email") + "-" + idx}
-                                type="button"
-                                onClick={() => setForgotQuery(studentEmail)}
-                                className={`px-2 py-1 bg-white border ${style} rounded-lg text-[10px] font-bold shadow-2xs hover:bg-slate-50 transition-colors`}
-                              >
-                                {studentEmail}
-                              </button>
-                            );
-                          })
-                        ) : (
-                          <button type="button" onClick={() => setForgotQuery("plc001@plc.edu.kh")} className="px-2 py-1 bg-white border border-blue-200 text-blue-700 rounded-lg text-[10px] font-bold shadow-2xs hover:bg-slate-50 transition-colors">plc001@plc.edu.kh</button>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {forgotSearchError && (
-                  <div className="p-2.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl font-bold flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                    <span>{forgotSearchError}</span>
-                  </div>
-                )}
-
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
-                  type="submit"
-                  disabled={forgotSearchLoading}
-                  className="group relative w-full py-3.5 px-6 rounded-full bg-amber-600 hover:bg-amber-700 active:scale-[0.98] text-white font-black text-base tracking-wide shadow-md shadow-amber-500/25 hover:shadow-lg hover:shadow-amber-500/35 border border-amber-300/40 transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 overflow-hidden"
-                >
-                  {forgotSearchLoading ? (
-                    <Loader2 className="w-5 h-5 animate-spin text-white" />
                   ) : (
-                    <>
-                      <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-xs ring-1 ring-white/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200">
-                        <Zap className="w-4 h-4 text-white stroke-[2.5]" />
+                    /* ADMIN / STAFF FORGOT PASSWORD FLOW */
+                    <div className="space-y-3">
+                      {/* TELEGRAM */}
+                      <motion.a
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.97 }}
+                        href={
+                          schoolTelegram
+                            ? schoolTelegram.startsWith("http")
+                              ? schoolTelegram
+                              : `https://t.me/${schoolTelegram.replace("@", "").trim()}?text=${encodeURIComponent("ជម្រាបសួរអ្នកគ្រប់គ្រងប្រព័ន្ធ! ខ្ញុំបាទ/នាងខ្ញុំសូមស្នើសុំកំណត់ពាក្យសម្ងាត់ឡើងវិញ។")}`
+                            : developerTelegram || "https://t.me/plccomputerschool"
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full p-4 rounded-2xl bg-[#4352b2] hover:bg-[#344199] text-white font-bold shadow-md shadow-indigo-900/20 border border-indigo-300/30 transition-all flex items-center justify-between gap-3 cursor-pointer group text-left"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 text-white group-hover:scale-110 transition-transform">
+                            <Send className="w-5 h-5 stroke-[2.2]" />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="text-[10px] font-bold text-indigo-100 uppercase tracking-wider">ស្នើសុំតាម TELEGRAM</div>
+                            <div className="text-xs sm:text-sm font-black tracking-tight truncate drop-shadow-3xs">
+                              {schoolTelegram
+                                ? schoolTelegram.startsWith("http")
+                                  ? schoolTelegram
+                                  : `https://t.me/${schoolTelegram.replace("@", "").trim()}`
+                                : "https://t.me/plccomputerschool"}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="px-3 py-1.5 rounded-full bg-white text-[#4352b2] text-xs font-black shrink-0 shadow-xs group-hover:bg-amber-300 group-hover:text-slate-900 transition-colors">
+                          ផ្ញើសារ ✈️
+                        </div>
+                      </motion.a>
+
+                      {/* PHONE NUMBERS */}
+                      <div className="w-full p-3.5 rounded-2xl bg-amber-50/90 border border-amber-200/90 text-left space-y-2 shadow-xs">
+                        <div className="flex items-center gap-2 text-amber-900">
+                          <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <Phone className="w-4 h-4 stroke-[2.2]" />
+                          </div>
+                          <div>
+                            <div className="text-[10px] font-bold uppercase tracking-wider text-amber-700">លេខទូរស័ព្ទអ្នកគ្រប់គ្រងប្រព័ន្ធ / រដ្ឋបាល</div>
+                            <div className="text-xs font-black text-amber-950">ទំនាក់ទំនងផ្ទាល់តាមទូរស័ព្ទ</div>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-2 pt-1">
+                          {Array.from(
+                            new Set(
+                              [
+                                ...(schoolPhone || "087 850 014 / 097 501 3648").split("/"),
+                                developerPhone || ""
+                              ]
+                                .map((p) => p.trim())
+                                .filter(Boolean)
+                            )
+                          ).map((phoneNum, idx) => {
+                            const telHref = `tel:${phoneNum.replace(/\s+/g, "")}`;
+                            return (
+                              <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-white border border-amber-200/70 shadow-3xs">
+                                <div className="flex items-center gap-2">
+                                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                  <span className="text-xs font-black text-slate-800 font-mono">📞 {phoneNum}</span>
+                                </div>
+                                <a
+                                  href={telHref}
+                                  className="px-3 py-1 rounded-full bg-amber-500 hover:bg-amber-600 text-white text-xs font-black transition-colors shadow-xs active:scale-95"
+                                >
+                                  ហៅចេញ
+                                </a>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
-                      <span className="drop-shadow-xs font-black">ស្វែងរកគណនីក្នុងប្រព័ន្ធ</span>
-                    </>
+                    </div>
                   )}
-                </motion.button>
-              </form>
-            )}
-
-            {/* RESULT / ACCOUNT FOUND STEP ("result") */}
-            {forgotStep === "result" && forgotSearchResult && forgotSearchResult.data && (
-              <div className="w-full space-y-3.5 text-left">
-                <div className="bg-slate-50 border-2 border-emerald-500/30 p-4 rounded-2xl shadow-sm space-y-3 relative overflow-hidden">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-emerald-100 border-2 border-emerald-400 flex items-center justify-center text-emerald-800 font-black text-base shrink-0 overflow-hidden shadow-xs">
-                      {forgotSearchResult?.data?.photoUrl ? (
-                        <img src={forgotSearchResult.data.photoUrl} alt="Photo" className="w-full h-full object-cover" />
-                      ) : (
-                        <User className="w-6 h-6" />
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <span className="inline-block px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase mb-0.5">
-                        {forgotSearchResult.type === "student" ? `កូដសិស្ស៖ ${forgotSearchResult?.data?.studentId}` :
-                         forgotSearchResult.type === "teacher" ? `កូដគ្រូបង្រៀន៖ ${forgotSearchResult?.data?.teacherId || 'TEA-001'}` :
-                         `គណនី ${forgotSearchResult?.data?.role === 'ADMIN' ? 'អ្នកគ្រប់គ្រង (Admin)' : 'បុគ្គលិករដ្ឋបាល (Staff)'}`}
-                      </span>
-                      <h4 className="text-sm sm:text-base font-black text-slate-900 truncate">
-                        {forgotSearchResult?.data?.nameKh || forgotSearchResult?.data?.fullName || "ឈ្មោះអ្នកប្រើប្រាស់"}
-                      </h4>
-                      <div className="text-[11px] text-slate-600 font-bold truncate">
-                        {forgotSearchResult?.data?.course || forgotSearchResult?.data?.email || "ព័ត៌មានគណនី"}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="border-t border-slate-200/80 pt-2.5 text-[11px] font-bold text-slate-700 space-y-1.5">
-                    {forgotSearchResult?.data?.phoneNumber && (
-                      <div className="flex items-center justify-between bg-white p-2 rounded-xl border border-slate-200">
-                        <span>📞 លេខទូរស័ព្ទ៖ <strong className="text-slate-900">{forgotSearchResult.data.phoneNumber}</strong></span>
-                        <a href={`tel:${forgotSearchResult.data.phoneNumber.replace(/\s+/g, '')}`} className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black hover:bg-emerald-700 transition-colors">
-                          ហៅចេញ
-                        </a>
-                      </div>
-                    )}
-                    {forgotSearchResult?.data?.email && (
-                      <div className="bg-white p-2 rounded-xl border border-slate-200">
-                        ✉️ អ៊ីម៉ែល៖ <strong className="text-slate-900">{forgotSearchResult.data.email}</strong>
-                      </div>
-                    )}
-                    {forgotSearchResult?.data?.guardianName && (
-                      <div className="bg-white p-2 rounded-xl border border-slate-200">
-                        👤 អាណាព្យាបាល៖ <strong className="text-slate-900">{forgotSearchResult.data.guardianName}</strong>
-                      </div>
-                    )}
-                  </div>
                 </div>
+              )}
 
-                <form onSubmit={handleForgotResetSubmit} className="space-y-3">
+              {/* INPUT / SEARCH STEP ("input") */}
+              {forgotStep === "input" && (
+                <form onSubmit={handleForgotSearchSubmit} className="w-full space-y-3.5 pt-1 text-left">
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700 block uppercase">
-                      បញ្ចូលពាក្យសម្ងាត់ថ្មី
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+                      {forgotMethod === "phone" ? "ផ្លាស់ប្ដូរពាក្យសម្ងាត់ដោយប្រើលេខទូរស័ព្ទ" :
+                       forgotMethod === "email" ? "ផ្លាស់ប្ដូរពាក្យសម្ងាត់ដោយប្រើអ៊ីម៉ែល" :
+                       "ផ្លាស់ប្ដូរពាក្យសម្ងាត់ដោយប្រើអត្តលេខ / ID"}
                     </label>
-                    <input
-                      type="password"
-                      value={newPasswordInput}
-                      onChange={(e) => setNewPasswordInput(e.target.value)}
-                      placeholder="ពាក្យសម្ងាត់ថ្មី (យ៉ាងហោច ៦ តួ)"
-                      required
-                      minLength={6}
-                      className="w-full px-4 py-2.5 rounded-2xl border border-slate-300 text-xs font-bold focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={forgotQuery}
+                        onChange={(e) => setForgotQuery(e.target.value)}
+                        placeholder={
+                          forgotMethod === "phone" ? "សូមបញ្ចូលលេខទូរស័ព្ទ..." :
+                          forgotMethod === "email" ? "សូមបញ្ចូលអាសយដ្ឋានអ៊ីម៉ែល..." :
+                          "សូមបញ្ចូលលេខសំគាល់សិស្ស..."
+                        }
+                        autoFocus
+                        required
+                        className="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white text-slate-800 text-sm font-semibold focus:outline-none focus:ring-4 focus:ring-[#4352b2]/10 focus:border-[#4352b2] transition-all"
+                      />
+                    </div>
                   </div>
 
-                  <motion.button
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.97 }}
+                  {/* Instructional guide box */}
+                  <div className="p-3 bg-indigo-50/70 border border-indigo-100 rounded-2xl text-xs text-indigo-900 flex items-start gap-2.5">
+                    <Info className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
+                    <div className="leading-relaxed font-medium">
+                      <span className="font-bold block text-indigo-950 mb-0.5">អក្សរណែនាំ៖</span>
+                      {forgotMethod === "phone" && "សូមបញ្ចូលលេខទូរស័ព្ទរបស់សិស្ស ឬអាណាព្យាបាលដែលបានចុះឈ្មោះក្នុងប្រព័ន្ធសាលារៀន ដើម្បីផ្ទៀងផ្ទាត់ និងផ្លាស់ប្ដូរពាក្យសម្ងាត់។"}
+                      {forgotMethod === "email" && "សូមបញ្ចូលអាសយដ្ឋានអ៊ីម៉ែលដែលបានភ្ជាប់ជាមួយគណនីរបស់អ្នក ដើម្បីស្វែងរកទិន្នន័យក្នុងប្រព័ន្ធ។"}
+                      {forgotMethod === "student_id" && "សូមបញ្ចូលអត្តលេខសិស្ស (Student ID) ឬឈ្មោះគណនីរបស់អ្នកដែលបានផ្តល់ជូនដោយសាលា។"}
+                    </div>
+                  </div>
+
+
+
+                  {forgotSearchError && (
+                    <div className="p-2.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-2xl font-bold flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                      <span>{forgotSearchError}</span>
+                    </div>
+                  )}
+
+                  <button
                     type="submit"
-                    disabled={resetLoading}
-                    className={`w-full py-3.5 px-6 rounded-full ${themeCfg.primaryBtn || "bg-blue-600 hover:bg-blue-700"} text-white font-black text-sm uppercase tracking-wider shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer`}
+                    disabled={forgotSearchLoading}
+                    className="w-full py-3.5 rounded-full bg-[#4352b2] hover:bg-[#344199] text-white font-extrabold text-sm uppercase tracking-wider shadow-md shadow-indigo-900/20 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
-                    {resetLoading ? (
+                    {forgotSearchLoading ? (
                       <Loader2 className="w-5 h-5 animate-spin text-white" />
                     ) : (
-                      <span>រក្សាទុកពាក្យសម្ងាត់ថ្មី</span>
+                      <>
+                        <Zap className="w-4 h-4" />
+                        <span>ស្វែងរកគណនីក្នុងប្រព័ន្ធ</span>
+                      </>
                     )}
-                  </motion.button>
+                  </button>
                 </form>
+              )}
 
-                <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl text-[11px] text-amber-900 font-bold flex items-center justify-between gap-2">
-                  <span>ឬទំនាក់ទំនងរដ្ឋបាលផ្ទាល់៖</span>
-                  <a href={`tel:${schoolPhone.split('/')[0].trim()}`} className="px-3 py-1 bg-amber-500 text-white rounded-full text-xs font-black hover:bg-amber-600 transition-colors">
-                    📞 {schoolPhone.split('/')[0].trim()}
-                  </a>
-                </div>
-              </div>
-            )}
+              {/* RESULT / ACCOUNT FOUND STEP ("result") */}
+              {forgotStep === "result" && forgotSearchResult && forgotSearchResult.data && (
+                <div className="w-full space-y-3.5 text-left">
+                  <div className="bg-slate-50 border-2 border-emerald-500/30 p-4 rounded-2xl shadow-sm space-y-3 relative overflow-hidden">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-emerald-100 border-2 border-emerald-400 flex items-center justify-center text-emerald-800 font-black text-base shrink-0 overflow-hidden shadow-xs">
+                        {forgotSearchResult?.data?.photoUrl ? (
+                          <img src={forgotSearchResult.data.photoUrl} alt="Photo" className="w-full h-full object-cover" />
+                        ) : (
+                          <User className="w-6 h-6" />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <span className="inline-block px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase mb-0.5">
+                          {forgotSearchResult.type === "student" ? `កូដសិស្ស៖ ${forgotSearchResult?.data?.studentId}` :
+                           forgotSearchResult.type === "teacher" ? `កូដគ្រូបង្រៀន៖ ${forgotSearchResult?.data?.teacherId || 'TEA-001'}` :
+                           `គណនី ${forgotSearchResult?.data?.role === 'ADMIN' ? 'អ្នកគ្រប់គ្រង (Admin)' : 'បុគ្គលិករដ្ឋបាល (Staff)'}`}
+                        </span>
+                        <h4 className="text-sm sm:text-base font-black text-slate-900 truncate">
+                          {forgotSearchResult?.data?.nameKh || forgotSearchResult?.data?.fullName || "ឈ្មោះអ្នកប្រើប្រាស់"}
+                        </h4>
+                        <div className="text-[11px] text-slate-600 font-bold truncate">
+                          {forgotSearchResult?.data?.course || forgotSearchResult?.data?.email || "ព័ត៌មានគណនី"}
+                        </div>
+                      </div>
+                    </div>
 
-            {/* RESET SUCCESS STEP ("reset_success") */}
-            {forgotStep === "reset_success" && (
-              <div className="w-full space-y-4 text-center py-2">
-                <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center border-4 border-emerald-200 shadow-md">
-                  <CheckCircle2 className="w-10 h-10" />
-                </div>
-                <div className="space-y-1">
-                  <h4 className="text-lg font-black text-emerald-800">ផ្លាស់ប្តូរជោគជ័យ!</h4>
-                  <p className="text-xs font-bold text-slate-600 leading-relaxed px-2">
-                    {resetSuccessMsg || "ពាក្យសម្ងាត់របស់អ្នកត្រូវបានកំណត់ឡើងវិញរួចរាល់។ សូមចូលប្រើប្រាស់ដោយប្រើពាក្យសម្ងាត់ថ្មី។"}
-                  </p>
-                </div>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.96 }}
-                  type="button"
-                  onClick={() => {
-                    setIsForgotPasswordOpen(false);
-                    setIsPortalModalOpen(true);
-                  }}
-                  className="group relative w-full py-3.5 px-6 rounded-full bg-amber-600 hover:bg-amber-700 active:scale-[0.98] text-white font-black text-base tracking-wide shadow-md shadow-amber-500/25 hover:shadow-lg hover:shadow-amber-500/35 border border-amber-300/40 transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer overflow-hidden"
-                >
-                  <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-xs ring-1 ring-white/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200">
-                    <UserCheck className="w-4 h-4 text-white stroke-[2.5]" />
+                    <div className="border-t border-slate-200/80 pt-2.5 text-[11px] font-bold text-slate-700 space-y-1.5">
+                      {forgotSearchResult?.data?.phoneNumber && (
+                        <div className="flex items-center justify-between bg-white p-2 rounded-xl border border-slate-200">
+                          <span>📞 លេខទូរស័ព្ទ៖ <strong className="text-slate-900">{forgotSearchResult.data.phoneNumber}</strong></span>
+                          <a href={`tel:${forgotSearchResult.data.phoneNumber.replace(/\s+/g, '')}`} className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black hover:bg-emerald-700 transition-colors">
+                            ហៅចេញ
+                          </a>
+                        </div>
+                      )}
+                      {forgotSearchResult?.data?.email && (
+                        <div className="bg-white p-2 rounded-xl border border-slate-200">
+                          ✉️ អ៊ីម៉ែល៖ <strong className="text-slate-900">{forgotSearchResult.data.email}</strong>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <span className="drop-shadow-xs font-black">ចូលប្រើប្រាស់ឥឡូវនេះ</span>
-                </motion.button>
-              </div>
-            )}
 
-          </div>
+                  <form onSubmit={handleForgotResetSubmit} className="space-y-3">
+                    <div className="space-y-1">
+                      <label className="text-xs font-black text-slate-700 block uppercase">
+                        បញ្ចូលពាក្យសម្ងាត់ថ្មី
+                      </label>
+                      <input
+                        type="password"
+                        value={newPasswordInput}
+                        onChange={(e) => setNewPasswordInput(e.target.value)}
+                        placeholder="ពាក្យសម្ងាត់ថ្មី (យ៉ាងហោច ៦ តួ)"
+                        required
+                        minLength={6}
+                        className="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#4352b2] focus:ring-2 focus:ring-[#4352b2]/20"
+                      />
+                    </div>
 
-          {/* 3. BOTTOM FOOTER WITH VERSION */}
-          <div className="w-full flex flex-col items-center mt-auto pt-2">
-            <p className="text-[11px] font-semibold text-slate-400 tracking-wide text-center mb-1">
-              ©2026 {schoolName || "PLC Computer School"}
-            </p>
-            <div className={`w-full ${themeCfg.bannerBg} text-white text-[10.5px] font-mono py-1.5 px-8 text-center shadow-md tracking-wider font-bold`}>
-              Version 1.3.6
+                    <button
+                      type="submit"
+                      disabled={resetLoading}
+                      className="w-full py-3.5 rounded-full bg-[#4352b2] hover:bg-[#344199] text-white font-extrabold text-sm uppercase tracking-wider shadow-md shadow-indigo-900/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      {resetLoading ? (
+                        <Loader2 className="w-5 h-5 animate-spin text-white" />
+                      ) : (
+                        <span>រក្សាទុកពាក្យសម្ងាត់ថ្មី</span>
+                      )}
+                    </button>
+                  </form>
+                </div>
+              )}
+
+              {/* RESET SUCCESS STEP ("reset_success") */}
+              {forgotStep === "reset_success" && (
+                <div className="w-full space-y-4 text-center py-2">
+                  <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center border-4 border-emerald-200 shadow-md">
+                    <CheckCircle2 className="w-10 h-10" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="text-lg font-black text-emerald-800">ផ្លាស់ប្តូរជោគជ័យ!</h4>
+                    <p className="text-xs font-bold text-slate-600 leading-relaxed px-2">
+                      {resetSuccessMsg || "ពាក្យសម្ងាត់របស់អ្នកត្រូវបានកំណត់ឡើងវិញរួចរាល់។ សូមចូលប្រើប្រាស់ដោយប្រើពាក្យសម្ងាត់ថ្មី។"}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsForgotPasswordOpen(false);
+                      setLoginMode("student");
+                    }}
+                    className="w-full py-3.5 rounded-full bg-[#4352b2] hover:bg-[#344199] text-white font-extrabold text-sm uppercase tracking-wider shadow-md cursor-pointer"
+                  >
+                    <span>ចូលប្រើប្រាស់ឥឡូវនេះ</span>
+                  </button>
+                </div>
+              )}
+
+            </div>
+
+            {/* Footer Area with Version */}
+            <div className="pt-4 flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider font-sans border-t border-slate-100 mt-6">
+              <span>©2026 {schoolName || "PLC Computer School"}</span>
+              <span>Version 1.3.6</span>
             </div>
           </div>
-
-        </div>
+        </motion.div>
       </div>
     );
   }
 
-  // Dedicated Registration Screen matching user's reference image
+  // Dedicated Registration Screen matching the modern Login Form design
   if (isRegisterScreenOpen) {
     return (
-      <div className="min-h-screen w-full bg-[#f8fafc] font-sans select-none flex flex-col justify-between items-center relative overflow-hidden pb-2">
-        {/* MAX WIDTH CONTAINER */}
-        <div className="w-full max-w-md mx-auto min-h-screen bg-white flex flex-col justify-between items-center shadow-xl relative overflow-hidden border-x border-slate-100">
-          
-          {/* 1. TOP DYNAMIC ARCHED HEADER BANNER */}
-          <div className={`w-full ${themeCfg.bannerBg} rounded-b-[45px] shadow-md relative overflow-hidden border-b-2 border-dashed border-amber-400 pt-3 pb-6 px-4 text-center transition-colors duration-300`}>
-            
-            {/* ICT Shadowy Background */}
-            <IctShadowyBackground />
+      <div className="min-h-screen w-full flex items-center justify-center bg-slate-100/80 p-3 sm:p-6 font-sans select-none relative overflow-hidden">
+        {/* Decorative Background Glows */}
+        <div className="absolute top-[-10%] left-[-10%] w-96 h-96 rounded-full bg-indigo-200/40 opacity-40 blur-3xl"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-blue-200/30 opacity-40 blur-3xl"></div>
 
-            {/* Top Control Bar with Back Arrow */}
-            <div className="relative z-20 flex items-center justify-between w-full mb-1">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="w-full max-w-md bg-white rounded-[32px] sm:rounded-[36px] shadow-2xl shadow-indigo-950/15 border border-slate-200/80 overflow-hidden z-10 relative flex flex-col justify-between"
+        >
+          {/* TOP MODERN GRADIENT HEADER BANNER WITH ABSTRACT WAVE ART */}
+          <div className="w-full bg-gradient-to-br from-[#2b337c] via-[#4352b2] to-[#5967cb] relative pt-4 pb-16 px-4 sm:px-5 border-b border-white/10">
+            
+            {/* Abstract Floating Circles & Wave Overlay */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-t-[32px] sm:rounded-t-[36px]">
+              <div className="absolute -left-10 -top-10 w-36 h-36 rounded-full bg-black/25 blur-2xs"></div>
+              <div className="absolute -right-8 -top-10 w-48 h-48 rounded-full bg-white/20 backdrop-blur-md"></div>
+              <div className="absolute right-6 top-8 w-28 h-28 rounded-full bg-white/25 shadow-inner"></div>
+              
+              {/* SVG Wave Lines Overlay */}
+              <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 400 200" fill="none">
+                <path d="M-50,120 C100,60 200,180 450,90 L450,200 L-50,200 Z" fill="white" fillOpacity="0.1" />
+                <path d="M-50,140 C120,80 250,190 450,110 L450,200 L-50,200 Z" fill="white" fillOpacity="0.15" />
+              </svg>
+            </div>
+
+            {/* Top Control Bar with Back Arrow & Language Selector */}
+            <div className="relative z-30 flex items-center justify-between w-full mb-3">
               <button
                 type="button"
                 onClick={() => {
@@ -1427,878 +1290,598 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
                     setIsRegisterScreenOpen(false);
                   }
                 }}
-                className="p-1 rounded-full hover:bg-white/10 text-white transition-colors cursor-pointer active:scale-95"
+                className="p-1.5 rounded-full bg-black/30 hover:bg-black/50 text-white transition-all cursor-pointer active:scale-95 border border-white/15"
                 title="ត្រឡប់ក្រោយ"
               >
-                <ArrowLeft className="w-6 h-6 stroke-[2.5]" />
+                <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
               </button>
 
-              {/* Language Selector Pill */}
-              <div className="bg-white/10 backdrop-blur-md rounded-full px-2 py-0.5 border border-white/20 shadow-xs flex items-center">
-                <LanguageSelector className="bg-transparent border-0 text-white shadow-none focus:ring-0 text-xs font-bold" />
-              </div>
+              {/* Clean Integrated Language Selector */}
+              <LanguageSelector className="flex items-center" />
             </div>
 
-            {/* SCHOOL LOGO SEAL CONTAINER */}
-            <div className="relative z-10 my-1">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.3 }}
-                className="w-22 h-22 sm:w-26 sm:h-26 rounded-full bg-white border-[3.5px] border-[#f0ab22] shadow-xl mx-auto flex items-center justify-center p-1.5 relative"
-              >
-                {schoolLogo ? (
-                  <img src={schoolLogo} alt="School Logo" className="w-full h-full object-contain rounded-full" />
-                ) : (
-                  <div className={`w-full h-full rounded-full ${themeCfg.sealBg} flex flex-col items-center justify-center text-white p-1 text-center border border-amber-300`}>
-                    <svg className="w-10 h-10 text-amber-300 mb-0.5" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    <span className="text-[7.5px] font-black uppercase tracking-tighter leading-none text-amber-200">
-                      {(schoolName || "PLC").split(" ")[0].toUpperCase()}
-                    </span>
-                  </div>
-                )}
-              </motion.div>
-            </div>
-
-            {/* SCHOOL NAME TYPOGRAPHY */}
-            <motion.div
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              className="relative z-10 mt-3"
-            >
-              <h1 className="text-xl sm:text-2xl font-black text-white tracking-wide font-serif leading-tight">
-                {schoolKhmerName || "សាលាកុំព្យូទ័រ ភីអិលស៊ី"}
-              </h1>
-              <p className="text-base sm:text-lg font-bold text-amber-200 font-serif italic tracking-wider mt-0.5 opacity-95">
-                {schoolName || "PLC Computer School"}
-              </p>
-            </motion.div>
-          </div>
-
-          {/* 2. MIDDLE CONTENT SECTION MATCHING SCREENSHOT EXACTLY */}
-          <div className="w-full px-5 sm:px-6 py-4 flex flex-col items-center text-center flex-1 justify-center max-w-sm mx-auto my-auto space-y-4">
-            
-            {/* SLOGAN WITH BRUSH UNDERLINE */}
-            <div className="flex flex-col items-center">
-              <h2 className={`${themeCfg.sloganText} font-black text-base sm:text-lg font-battambang tracking-tight`}>
-                សិក្សាបច្ចេកវិទ្យាឌីជីថល ដើម្បីភាពរីកចម្រើនទៅមុខ
-              </h2>
-              <div className="flex items-center justify-center gap-1.5 mt-1 text-amber-500">
-                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
-                <Star className="w-4 h-4 fill-amber-400 text-amber-500" />
-                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
-              </div>
-            </div>
-
-            {/* MAIN SUBTITLE */}
-            {registerStep === "select" && (
-              <div className="space-y-1">
-                <h3 className="text-sm sm:text-base font-extrabold text-slate-600">
-                  ចុះឈ្មោះជាមាតាបិតា ឬសិស្ស។
-                </h3>
-              </div>
-            )}
-
-            {/* STEP 1: 2 CARDS FOR SELECTION ("ឪពុកម្តាយ" vs "សិស្ស") */}
-            {registerStep === "select" && (
-              <div className="grid grid-cols-2 gap-4 w-full pt-2">
-                
-                {/* CARD 1: PARENTS ("ឪពុកម្តាយ") */}
-                <motion.button
-                  whileHover={{ scale: 1.03, translateY: -2 }}
-                  whileTap={{ scale: 0.96 }}
-                  type="button"
-                  onClick={() => handleSelectRegisterType("parent")}
-                  className="bg-white rounded-3xl p-5 sm:p-6 shadow-md border border-slate-100 hover:border-amber-400 hover:shadow-lg transition-all flex flex-col items-center justify-center space-y-3 cursor-pointer group"
-                >
-                  <div className="p-1 rounded-2xl bg-slate-50 group-hover:bg-amber-50 transition-colors">
-                    <ParentsIllustration className="w-20 h-20 sm:w-24 sm:h-24" />
-                  </div>
-                  <span className="font-extrabold text-slate-800 text-base sm:text-lg tracking-tight group-hover:text-[#8f1218] transition-colors">
-                    ឪពុកម្តាយ
-                  </span>
-                </motion.button>
-
-                {/* CARD 2: STUDENTS ("សិស្ស") */}
-                <motion.button
-                  whileHover={{ scale: 1.03, translateY: -2 }}
-                  whileTap={{ scale: 0.96 }}
-                  type="button"
-                  onClick={() => handleSelectRegisterType("student")}
-                  className="bg-white rounded-3xl p-5 sm:p-6 shadow-md border border-slate-100 hover:border-amber-400 hover:shadow-lg transition-all flex flex-col items-center justify-center space-y-3 cursor-pointer group"
-                >
-                  <div className="p-1 rounded-2xl bg-slate-50 group-hover:bg-amber-50 transition-colors">
-                    <StudentIllustration className="w-20 h-20 sm:w-24 sm:h-24" />
-                  </div>
-                  <span className="font-extrabold text-slate-800 text-base sm:text-lg tracking-tight group-hover:text-[#8f1218] transition-colors">
-                    សិស្ស
-                  </span>
-                </motion.button>
-
-              </div>
-            )}
-
-            {/* STEP 2: EXACT SCREENSHOT REGISTRATION FORM FOR PARENTS / STUDENTS */}
-            {registerStep === "form" && (
-              <form onSubmit={handleRegisterFormSubmit} className="w-full space-y-3 pt-1 text-left">
-                
-                {registerType === "student" ? (
-                  <>
-                    {/* Student Field 1: Student ID with ID card icon */}
-                    <div className={`w-full relative flex items-center bg-white border border-slate-300 ${themeCfg.focusRing} focus-within:ring-2 rounded-full h-12 px-4 shadow-xs transition-all`}>
-                      <div className="w-5 h-5 text-slate-400 shrink-0 mr-3 flex items-center justify-center">
-                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <rect x="3" y="4" width="18" height="16" rx="3" />
-                          <circle cx="9" cy="10" r="2.5" />
-                          <path d="M15 8h2" />
-                          <path d="M15 12h2" />
-                          <path d="M6 16c0-1.5 1.5-2.5 3-2.5s3 1 3 2.5" />
-                        </svg>
-                      </div>
-                      <input
-                        type="text"
-                        value={regStudentId}
-                        onChange={(e) => setRegStudentId(e.target.value)}
-                        placeholder="សូមបញ្ចូលលេខសំគាល់សិស្ស"
-                        required
-                        className="w-full bg-transparent text-slate-800 text-xs sm:text-sm font-semibold focus:outline-none placeholder:text-slate-400"
-                      />
-                    </div>
-
-                    {/* Student Field 2: Password */}
-                    <div className={`w-full relative flex items-center bg-white border border-slate-300 ${themeCfg.focusRing} focus-within:ring-2 rounded-full h-12 px-4 shadow-xs transition-all`}>
-                      <Lock className="w-5 h-5 text-slate-400 shrink-0 mr-3" />
-                      <input
-                        type="password"
-                        value={regPassword}
-                        onChange={(e) => setRegPassword(e.target.value)}
-                        placeholder="សូមបញ្ចូលពាក្យសម្ងាត់"
-                        required
-                        minLength={6}
-                        className="w-full bg-transparent text-slate-800 text-xs sm:text-sm font-semibold focus:outline-none placeholder:text-slate-400"
-                      />
-                    </div>
-
-                    {/* Student Field 3: Confirm Password */}
-                    <div className={`w-full relative flex items-center bg-white border border-slate-300 ${themeCfg.focusRing} focus-within:ring-2 rounded-full h-12 px-4 shadow-xs transition-all`}>
-                      <Lock className="w-5 h-5 text-slate-400 shrink-0 mr-3" />
-                      <input
-                        type="password"
-                        value={regConfirmPassword}
-                        onChange={(e) => setRegConfirmPassword(e.target.value)}
-                        placeholder="សូមបញ្ចូលបញ្ជាក់ពាក្យសម្ងាត់"
-                        required
-                        minLength={6}
-                        className="w-full bg-transparent text-slate-800 text-xs sm:text-sm font-semibold focus:outline-none placeholder:text-slate-400"
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    {/* Parent Field 1: First Name */}
-                    <div className={`w-full relative flex items-center bg-white border border-slate-300 ${themeCfg.focusRing} focus-within:ring-2 rounded-full h-12 px-4 shadow-xs transition-all`}>
-                      <User className="w-5 h-5 text-slate-400 shrink-0 mr-3" />
-                      <input
-                        type="text"
-                        value={regFirstName}
-                        onChange={(e) => setRegFirstName(e.target.value)}
-                        placeholder="សូមបញ្ចូលនាម"
-                        required
-                        className="w-full bg-transparent text-slate-800 text-xs sm:text-sm font-semibold focus:outline-none placeholder:text-slate-400"
-                      />
-                    </div>
-
-                    {/* Parent Field 2: Last Name */}
-                    <div className={`w-full relative flex items-center bg-white border border-slate-300 ${themeCfg.focusRing} focus-within:ring-2 rounded-full h-12 px-4 shadow-xs transition-all`}>
-                      <User className="w-5 h-5 text-slate-400 shrink-0 mr-3" />
-                      <input
-                        type="text"
-                        value={regLastName}
-                        onChange={(e) => setRegLastName(e.target.value)}
-                        placeholder="សូមបញ្ចូលគោត្តនាម"
-                        required
-                        className="w-full bg-transparent text-slate-800 text-xs sm:text-sm font-semibold focus:outline-none placeholder:text-slate-400"
-                      />
-                    </div>
-
-                    {/* Parent Field 3: Phone Number with +855 badge */}
-                    <div className={`w-full relative flex items-center bg-white border border-slate-300 ${themeCfg.focusRing} focus-within:ring-2 rounded-full h-12 px-4 shadow-xs transition-all`}>
-                      <span className="font-extrabold text-slate-800 text-xs sm:text-sm shrink-0 mr-3 pr-2.5 border-r border-slate-200">
-                        +855
-                      </span>
-                      <input
-                        type="tel"
-                        value={regPhone}
-                        onChange={(e) => setRegPhone(e.target.value)}
-                        placeholder="សូមបញ្ចូលលេខទូរស័ព្ទ"
-                        required
-                        className="w-full bg-transparent text-slate-800 text-xs sm:text-sm font-semibold focus:outline-none placeholder:text-slate-400"
-                      />
-                    </div>
-
-                    {/* Parent Field 4: Password */}
-                    <div className={`w-full relative flex items-center bg-white border border-slate-300 ${themeCfg.focusRing} focus-within:ring-2 rounded-full h-12 px-4 shadow-xs transition-all`}>
-                      <Lock className="w-5 h-5 text-slate-400 shrink-0 mr-3" />
-                      <input
-                        type="password"
-                        value={regPassword}
-                        onChange={(e) => setRegPassword(e.target.value)}
-                        placeholder="សូមបញ្ចូលពាក្យសម្ងាត់"
-                        required
-                        minLength={6}
-                        className="w-full bg-transparent text-slate-800 text-xs sm:text-sm font-semibold focus:outline-none placeholder:text-slate-400"
-                      />
-                    </div>
-
-                    {/* Parent Field 5: Confirm Password */}
-                    <div className={`w-full relative flex items-center bg-white border border-slate-300 ${themeCfg.focusRing} focus-within:ring-2 rounded-full h-12 px-4 shadow-xs transition-all`}>
-                      <Lock className="w-5 h-5 text-slate-400 shrink-0 mr-3" />
-                      <input
-                        type="password"
-                        value={regConfirmPassword}
-                        onChange={(e) => setRegConfirmPassword(e.target.value)}
-                        placeholder="សូមបញ្ចូលបញ្ជាក់ពាក្យសម្ងាត់"
-                        required
-                        minLength={6}
-                        className="w-full bg-transparent text-slate-800 text-xs sm:text-sm font-semibold focus:outline-none placeholder:text-slate-400"
-                      />
-                    </div>
-                  </>
-                )}
-
-                {/* Error Banner if any */}
-                {regFormError && (
-                  <div className="p-2.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl font-bold flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                    <span>{regFormError}</span>
-                  </div>
-                )}
-
-                {/* PRIMARY BLUE ACTION BUTTON */}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
-                  type="submit"
-                  disabled={registerSubmitLoading}
-                  className="group relative w-full py-3.5 px-6 rounded-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-black text-base sm:text-lg tracking-wide shadow-md shadow-sky-600/25 hover:shadow-lg hover:shadow-sky-600/35 border border-sky-300/40 transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer mt-3 overflow-hidden"
-                >
-                  {registerSubmitLoading ? (
-                    <Loader2 className="w-6 h-6 animate-spin text-white" />
-                  ) : (
-                    <>
-                      <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-xs ring-1 ring-white/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200">
-                        <Sparkles className="w-4 h-4 text-amber-300 stroke-[2.5]" />
-                      </div>
-                      <span className="drop-shadow-xs font-black">ចុះឈ្មោះចូលប្រើ</span>
-                    </>
-                  )}
-                </motion.button>
-
-                {/* Secondary Option link to search by student code */}
-                <div className="text-center pt-1">
-                  <button
-                    type="button"
-                    onClick={() => setRegisterStep("input")}
-                    className="text-xs font-bold text-slate-500 hover:text-[#8f1218] transition-colors cursor-pointer"
-                  >
-                    ឬស្វែងរកតាមលេខសំគាល់សិស្ស (Student ID)
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* STEP 2: INPUT FORM FOR SEARCHING SYSTEM DATA */}
-            {registerStep === "input" && (
-              <form onSubmit={handleRegisterSearchSubmit} className="w-full space-y-3.5 pt-1 text-left">
-                <div className="space-y-1">
-                  <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
-                    {registerType === "parent" ? "បញ្ចូលលេខទូរស័ព្ទអាណាព្យាបាល ឬកូដសិស្ស" : "បញ្ចូលលេខសំគាល់សិស្ស (Student ID)"}
-                  </label>
-                  <input
-                    type="text"
-                    value={registerQuery}
-                    onChange={(e) => setRegisterQuery(e.target.value)}
-                    placeholder={registerType === "parent" ? "ឧ. 012345678 ឬ STU001" : "ឧ. STU001 ឬ PLC-001"}
-                    autoFocus
-                    required
-                    className="w-full px-4 py-3 rounded-2xl border-2 border-blue-600 bg-white text-slate-800 text-xs sm:text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-600/20 transition-all"
-                  />
-                </div>
-
-                {/* Demo Presets */}
-                <div className="bg-slate-50 p-2.5 rounded-2xl border border-slate-100">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-1">
-                    ទិន្នន័យគំរូក្នុងប្រព័ន្ធ៖
-                  </span>
-                  <div className="flex flex-wrap gap-1.5">
-                    <button type="button" onClick={() => setRegisterQuery("STU001")} className="px-2.5 py-1 bg-white border border-amber-200 text-amber-700 rounded-lg text-[10px] font-bold cursor-pointer">STU001 (សិស្ស)</button>
-                    <button type="button" onClick={() => setRegisterQuery("PLC-001")} className="px-2.5 py-1 bg-white border border-blue-200 text-blue-700 rounded-lg text-[10px] font-bold cursor-pointer">PLC-001 (សុខ សុភក្ត្រា)</button>
-                    <button type="button" onClick={() => setRegisterQuery("012345678")} className="px-2.5 py-1 bg-white border border-rose-200 text-rose-700 rounded-lg text-[10px] font-bold cursor-pointer">012345678 (អាណាព្យាបាល)</button>
-                  </div>
-                </div>
-
-                {registerSearchError && (
-                  <div className="p-2.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl font-bold flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                    <span>{registerSearchError}</span>
-                  </div>
-                )}
-
-                <motion.button
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.97 }}
-                  type="submit"
-                  disabled={registerSearchLoading}
-                  className="w-full py-3.5 px-6 rounded-full bg-[#f39c12] hover:bg-[#e08e0b] text-white font-black text-sm uppercase tracking-wider shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  {registerSearchLoading ? (
-                    <Loader2 className="w-5 h-5 animate-spin text-white" />
-                  ) : (
-                    <span>ស្វែងរកព័ត៌មានក្នុងប្រព័ន្ធ</span>
-                  )}
-                </motion.button>
-              </form>
-            )}
-
-            {/* STEP 3: RESULT MATCHED & PASSWORD CREATION */}
-            {registerStep === "result" && registerSearchResult && (
-              <div className="w-full space-y-3.5 text-left">
-                <div className="bg-slate-50 border-2 border-emerald-500/30 p-3.5 rounded-2xl shadow-sm space-y-2 max-h-[40vh] overflow-y-auto">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">
-                    រកឃើញទិន្នន័យស្របគ្នា ({registerSearchResult.count})
-                  </span>
-                  {registerSearchResult.data?.map((item: any, idx: number) => (
-                    <div key={idx} className="flex items-center gap-3 pt-1 border-t border-slate-200/60 first:border-0 first:pt-0">
-                      <div className="w-10 h-10 rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-800 font-black shrink-0 overflow-hidden text-xs">
-                        {item.photoUrl ? (
-                          <img src={item.photoUrl} alt="Photo" className="w-full h-full object-cover" />
-                        ) : (
-                          <User className="w-5 h-5" />
-                        )}
-                      </div>
-                      <div>
-                        <div className="text-[11px] font-black text-blue-700">{item.studentId}</div>
-                        <h4 className="text-xs font-black text-slate-800">{item.nameKh}</h4>
-                        <div className="text-[10px] text-slate-500 font-bold">{item.course} - {item.level}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <form onSubmit={handleRegisterSubmit} className="space-y-3">
-                  <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700 block uppercase">
-                      បង្កើតពាក្យសម្ងាត់សម្រាប់ចូលប្រើប្រាស់
-                    </label>
-                    <input
-                      type="password"
-                      value={regPassword}
-                      onChange={(e) => setRegPassword(e.target.value)}
-                      placeholder="ពាក្យសម្ងាត់ (យ៉ាងហោច ៦ តួ)"
-                      required
-                      minLength={6}
-                      className="w-full px-4 py-2.5 rounded-2xl border border-slate-300 text-xs font-bold focus:outline-none focus:border-blue-600"
-                    />
-                  </div>
-
-                  <motion.button
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.97 }}
-                    type="submit"
-                    disabled={registerSubmitLoading}
-                    className={`w-full py-3.5 px-6 rounded-full ${themeCfg.primaryBtn || "bg-blue-600 hover:bg-blue-700"} text-white font-black text-sm uppercase tracking-wider shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer`}
-                  >
-                    {registerSubmitLoading ? (
-                      <Loader2 className="w-5 h-5 animate-spin text-white" />
-                    ) : (
-                      <span>ចុះឈ្មោះ និងបង្កើតគណនី</span>
-                    )}
-                  </motion.button>
-                </form>
-              </div>
-            )}
-
-            {/* STEP 4: SUCCESS */}
-            {registerStep === "success" && (
-              <div className="w-full space-y-4 text-center py-2">
-                <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center border-4 border-emerald-200 shadow-md">
-                  <CheckCircle2 className="w-10 h-10" />
-                </div>
-                <div className="space-y-1">
-                  <h4 className="text-lg font-black text-emerald-800">ចុះឈ្មោះជោគជ័យ!</h4>
-                  <p className="text-xs font-bold text-slate-600 leading-relaxed px-2">
-                    {registerSuccessMsg || "គណនីរបស់អ្នកត្រូវបានបង្កើត និងភ្ជាប់ទៅប្រព័ន្ធរួចរាល់។"}
-                  </p>
-                </div>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.96 }}
-                  type="button"
-                  onClick={() => {
-                    setIsRegisterScreenOpen(false);
-                    setIsPortalModalOpen(true);
-                  }}
-                  className="w-full py-3.5 px-6 rounded-full bg-[#f39c12] hover:bg-[#e08e0b] text-white font-black text-sm uppercase tracking-wider shadow-md cursor-pointer"
-                >
-                  <span>ចូលប្រើប្រាស់ឥឡូវនេះ</span>
-                </motion.button>
-              </div>
-            )}
-
-          </div>
-
-          {/* 3. BOTTOM FOOTER WITH VERSION */}
-          <div className="w-full flex flex-col items-center mt-auto pt-2">
-            <p className="text-[11px] font-semibold text-slate-400 tracking-wide text-center mb-1">
-              ©2026 {schoolName || "PLC Computer School"}
-            </p>
-            <div className="w-full bg-[#1e293b] text-slate-300 text-[11px] font-mono py-1.5 px-8 text-center shadow-md tracking-wider font-bold">
-              Version 1.3.6
+            {/* WELCOME BADGE HEADER TEXT */}
+            <div className="relative z-10 flex items-center justify-center gap-2 max-w-sm mx-auto mt-1 py-1 text-white">
+              <Sparkles className="w-4.5 h-4.5 text-amber-300 shrink-0" />
+              <span className="text-sm font-black tracking-wide truncate">
+                ចុះឈ្មោះប្រើប្រាស់ប្រព័ន្ធ (REGISTER)
+              </span>
             </div>
           </div>
 
-        </div>
-      </div>
-    );
-  }
-
-  // Guardian / Student Mobile Portal Interface matching user's reference image
-  if (loginMode === "student") {
-    // If studentPortalView === "login", show the exact Login Screen from user's screenshot
-    if (isPortalModalOpen) {
-      return (
-        <div className="min-h-screen w-full bg-[#f8fafc] font-sans select-none flex flex-col justify-between items-center relative overflow-hidden pb-2">
-          
-          {/* MAX WIDTH CONTAINER */}
-          <div className="w-full max-w-md mx-auto min-h-screen bg-white flex flex-col justify-between items-center shadow-xl relative overflow-hidden border-x border-slate-100">
-            
-            {/* 1. TOP DYNAMIC ARCHED HEADER BANNER */}
-            <div className={`w-full ${themeCfg.bannerBg} rounded-b-[45px] shadow-md relative overflow-hidden border-b-2 border-dashed border-amber-400 pt-3 pb-7 px-4 text-center transition-colors duration-300`}>
-              
-              {/* ICT Shadowy Background */}
-              <IctShadowyBackground />
-
-              {/* Top Control Bar with Back Arrow */}
-              <div className="relative z-20 flex items-center justify-between w-full mb-1">
-                <button
-                  type="button"
-                  onClick={() => setIsPortalModalOpen(false)}
-                  className="p-1 rounded-full hover:bg-white/10 text-white transition-colors cursor-pointer active:scale-95"
-                  title="ត្រឡប់ក្រោយ"
-                >
-                  <ArrowLeft className="w-6 h-6 stroke-[2.5]" />
-                </button>
-
-                {/* Language Selector Pill */}
-                <div className="bg-white/10 backdrop-blur-md rounded-full px-2 py-0.5 border border-white/20 shadow-xs flex items-center">
-                  <LanguageSelector className="bg-transparent border-0 text-white shadow-none focus:ring-0 text-xs font-bold" />
-                </div>
-              </div>
-
-              {/* SCHOOL LOGO SEAL CONTAINER */}
-              <div className="relative z-10 my-1">
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                  className="w-22 h-22 sm:w-26 sm:h-26 rounded-full bg-white border-[3.5px] border-[#f0ab22] shadow-xl mx-auto flex items-center justify-center p-1.5 relative"
-                >
-                  {schoolLogo ? (
-                    <img src={schoolLogo} alt="School Logo" className="w-full h-full object-contain rounded-full" />
-                  ) : (
-                    <div className={`w-full h-full rounded-full ${themeCfg.sealBg} flex flex-col items-center justify-center text-white p-1 text-center border border-amber-300`}>
-                      <svg className="w-10 h-10 text-amber-300 mb-0.5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      <span className="text-[7.5px] font-black uppercase tracking-tighter leading-none text-amber-200">
-                        {(schoolName || "PLC").split(" ")[0].toUpperCase()}
-                      </span>
-                    </div>
-                  )}
-                </motion.div>
-              </div>
-
-              {/* SCHOOL NAME TYPOGRAPHY */}
-              <motion.div
-                initial={{ y: 10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                className="relative z-10 mt-3"
-              >
-                <h1 className="text-xl sm:text-2xl font-black text-white tracking-wide font-serif leading-tight">
-                  {schoolKhmerName || "សាលាកុំព្យូទ័រ ភីអិលស៊ី"}
+          {/* OVERLAPPING WHITE CONTENT SHEET WITH BIG ROUNDED CORNERS */}
+          <div className="-mt-10 relative z-20 bg-white rounded-t-[32px] sm:rounded-t-[36px] px-6 sm:px-8 pt-7 pb-6 flex-1 flex flex-col justify-between">
+            <div>
+              {/* SCHOOL HEADING */}
+              <div className="text-center mb-4">
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-[#4352b2] tracking-tight">
+                  {uiLang === 'en' ? 'PLC Computer School' : 'សាលាកុំព្យូទ័រ ភី អិល ស៊ី'}
                 </h1>
-                <p className="text-base sm:text-lg font-bold text-amber-200 font-serif italic tracking-wider mt-0.5 opacity-95">
-                  {schoolName || "PLC Computer School"}
-                </p>
-              </motion.div>
-            </div>
+              </div>
 
-            {/* 2. MIDDLE FORM SECTION MATCHING SCREENSHOT EXACTLY */}
-            <div className="w-full px-6 sm:px-8 py-4 flex flex-col items-center text-center flex-1 justify-center max-w-sm mx-auto my-auto space-y-5">
-              
-              {/* SLOGAN WITH RED BRUSH UNDERLINE */}
-              <div className="flex flex-col items-center">
-                <h2 className={`${themeCfg.sloganText} font-black text-base sm:text-lg font-battambang tracking-tight`}>
+              {/* SLOGAN & INSTRUCTION */}
+              <div className="flex flex-col items-center mb-5 text-center">
+                <h2 className="text-[#1e3a8a] font-black text-sm sm:text-base font-battambang tracking-tight">
                   សិក្សាបច្ចេកវិទ្យាឌីជីថល ដើម្បីភាពរីកចម្រើនទៅមុខ
                 </h2>
-                <div className="flex items-center justify-center gap-1.5 mt-1 text-amber-500">
+                <div className="flex items-center justify-center gap-1.5 mt-1 mb-1 text-amber-500">
                   <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
                   <Star className="w-4 h-4 fill-amber-400 text-amber-500" />
                   <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
                 </div>
+                {registerStep === "select" && (
+                  <p className="text-xs text-slate-500 font-bold leading-relaxed px-2">
+                    សូមជ្រើសរើសប្រភេទគណនីដែលអ្នកចង់ចុះឈ្មោះ៖
+                  </p>
+                )}
               </div>
 
-              {/* LOGIN FORM FIELDS */}
-              <form onSubmit={handleSubmit} className="w-full space-y-3.5 mt-2">
+              {/* STEP 1: 2 CARDS FOR SELECTION ("ឪពុកម្តាយ" vs "សិស្ស") */}
+              {registerStep === "select" && (
+                <div className="grid grid-cols-2 gap-3.5 w-full pt-1">
+                  
+                  {/* CARD 1: PARENTS ("ឪពុកម្តាយ") */}
+                  <button
+                    type="button"
+                    onClick={() => handleSelectRegisterType("parent")}
+                    className="bg-slate-50 rounded-2xl p-4 sm:p-5 border-2 border-slate-100 hover:border-[#4352b2] hover:bg-indigo-50/40 hover:shadow-md transition-all flex flex-col items-center justify-center space-y-2 cursor-pointer group"
+                  >
+                    <div className="p-1 rounded-2xl bg-white shadow-2xs group-hover:scale-105 transition-transform">
+                      <ParentsIllustration className="w-16 h-16 sm:w-20 sm:h-20" />
+                    </div>
+                    <span className="font-extrabold text-slate-800 text-sm sm:text-base tracking-tight group-hover:text-[#4352b2] transition-colors">
+                      ឪពុកម្តាយ
+                    </span>
+                  </button>
+
+                  {/* CARD 2: STUDENTS ("សិស្ស") */}
+                  <button
+                    type="button"
+                    onClick={() => handleSelectRegisterType("student")}
+                    className="bg-slate-50 rounded-2xl p-4 sm:p-5 border-2 border-slate-100 hover:border-[#4352b2] hover:bg-indigo-50/40 hover:shadow-md transition-all flex flex-col items-center justify-center space-y-2 cursor-pointer group"
+                  >
+                    <div className="p-1 rounded-2xl bg-white shadow-2xs group-hover:scale-105 transition-transform">
+                      <StudentIllustration className="w-16 h-16 sm:w-20 sm:h-20" />
+                    </div>
+                    <span className="font-extrabold text-slate-800 text-sm sm:text-base tracking-tight group-hover:text-[#4352b2] transition-colors">
+                      សិស្ស
+                    </span>
+                  </button>
+
+                </div>
+              )}
+
+              {/* STEP 2: REGISTRATION FORM FOR PARENTS / STUDENTS */}
+              {registerStep === "form" && (
+                <form onSubmit={handleRegisterFormSubmit} className="w-full space-y-3 pt-1 text-left">
+                  
+                  {registerType === "student" ? (
+                    <>
+                      {/* Student Field 1: Student ID */}
+                      <div className="w-full relative flex items-center bg-white border border-slate-200 focus-within:ring-4 focus-within:ring-[#4352b2]/10 focus-within:border-[#4352b2] rounded-full h-11 px-4 transition-all">
+                        <div className="w-5 h-5 text-slate-400 shrink-0 mr-3 flex items-center justify-center">
+                          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="4" width="18" height="16" rx="3" />
+                            <circle cx="9" cy="10" r="2.5" />
+                            <path d="M15 8h2" />
+                            <path d="M15 12h2" />
+                            <path d="M6 16c0-1.5 1.5-2.5 3-2.5s3 1 3 2.5" />
+                          </svg>
+                        </div>
+                        <input
+                          type="text"
+                          value={regStudentId}
+                          onChange={(e) => setRegStudentId(e.target.value)}
+                          placeholder="សូមបញ្ចូលលេខសំគាល់សិស្ស"
+                          required
+                          className="w-full bg-transparent text-slate-800 text-xs sm:text-sm font-semibold focus:outline-none placeholder:text-slate-400"
+                        />
+                      </div>
+
+                      {/* Student Field 2: Password */}
+                      <div className="w-full relative flex items-center bg-white border border-slate-200 focus-within:ring-4 focus-within:ring-[#4352b2]/10 focus-within:border-[#4352b2] rounded-full h-11 px-4 transition-all">
+                        <Lock className="w-4 h-4 text-slate-400 shrink-0 mr-3" />
+                        <input
+                          type="password"
+                          value={regPassword}
+                          onChange={(e) => setRegPassword(e.target.value)}
+                          placeholder="សូមបញ្ចូលពាក្យសម្ងាត់"
+                          required
+                          minLength={6}
+                          className="w-full bg-transparent text-slate-800 text-xs sm:text-sm font-semibold focus:outline-none placeholder:text-slate-400"
+                        />
+                      </div>
+
+                      {/* Student Field 3: Confirm Password */}
+                      <div className="w-full relative flex items-center bg-white border border-slate-200 focus-within:ring-4 focus-within:ring-[#4352b2]/10 focus-within:border-[#4352b2] rounded-full h-11 px-4 transition-all">
+                        <Lock className="w-4 h-4 text-slate-400 shrink-0 mr-3" />
+                        <input
+                          type="password"
+                          value={regConfirmPassword}
+                          onChange={(e) => setRegConfirmPassword(e.target.value)}
+                          placeholder="សូមបញ្ចូលបញ្ជាក់ពាក្យសម្ងាត់"
+                          required
+                          minLength={6}
+                          className="w-full bg-transparent text-slate-800 text-xs sm:text-sm font-semibold focus:outline-none placeholder:text-slate-400"
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Parent Field 1: First Name */}
+                      <div className="w-full relative flex items-center bg-white border border-slate-200 focus-within:ring-4 focus-within:ring-[#4352b2]/10 focus-within:border-[#4352b2] rounded-full h-11 px-4 transition-all">
+                        <User className="w-4 h-4 text-slate-400 shrink-0 mr-3" />
+                        <input
+                          type="text"
+                          value={regFirstName}
+                          onChange={(e) => setRegFirstName(e.target.value)}
+                          placeholder="សូមបញ្ចូលនាម"
+                          required
+                          className="w-full bg-transparent text-slate-800 text-xs sm:text-sm font-semibold focus:outline-none placeholder:text-slate-400"
+                        />
+                      </div>
+
+                      {/* Parent Field 2: Last Name */}
+                      <div className="w-full relative flex items-center bg-white border border-slate-200 focus-within:ring-4 focus-within:ring-[#4352b2]/10 focus-within:border-[#4352b2] rounded-full h-11 px-4 transition-all">
+                        <User className="w-4 h-4 text-slate-400 shrink-0 mr-3" />
+                        <input
+                          type="text"
+                          value={regLastName}
+                          onChange={(e) => setRegLastName(e.target.value)}
+                          placeholder="សូមបញ្ចូលគោត្តនាម"
+                          required
+                          className="w-full bg-transparent text-slate-800 text-xs sm:text-sm font-semibold focus:outline-none placeholder:text-slate-400"
+                        />
+                      </div>
+
+                      {/* Parent Field 3: Phone Number with +855 badge */}
+                      <div className="w-full relative flex items-center bg-white border border-slate-200 focus-within:ring-4 focus-within:ring-[#4352b2]/10 focus-within:border-[#4352b2] rounded-full h-11 px-4 transition-all">
+                        <span className="font-extrabold text-slate-800 text-xs shrink-0 mr-3 pr-2.5 border-r border-slate-200">
+                          +855
+                        </span>
+                        <input
+                          type="tel"
+                          value={regPhone}
+                          onChange={(e) => setRegPhone(e.target.value)}
+                          placeholder="សូមបញ្ចូលលេខទូរស័ព្ទ"
+                          required
+                          className="w-full bg-transparent text-slate-800 text-xs sm:text-sm font-semibold focus:outline-none placeholder:text-slate-400"
+                        />
+                      </div>
+
+                      {/* Parent Field 4: Password */}
+                      <div className="w-full relative flex items-center bg-white border border-slate-200 focus-within:ring-4 focus-within:ring-[#4352b2]/10 focus-within:border-[#4352b2] rounded-full h-11 px-4 transition-all">
+                        <Lock className="w-4 h-4 text-slate-400 shrink-0 mr-3" />
+                        <input
+                          type="password"
+                          value={regPassword}
+                          onChange={(e) => setRegPassword(e.target.value)}
+                          placeholder="សូមបញ្ចូលពាក្យសម្ងាត់"
+                          required
+                          minLength={6}
+                          className="w-full bg-transparent text-slate-800 text-xs sm:text-sm font-semibold focus:outline-none placeholder:text-slate-400"
+                        />
+                      </div>
+
+                      {/* Parent Field 5: Confirm Password */}
+                      <div className="w-full relative flex items-center bg-white border border-slate-200 focus-within:ring-4 focus-within:ring-[#4352b2]/10 focus-within:border-[#4352b2] rounded-full h-11 px-4 transition-all">
+                        <Lock className="w-4 h-4 text-slate-400 shrink-0 mr-3" />
+                        <input
+                          type="password"
+                          value={regConfirmPassword}
+                          onChange={(e) => setRegConfirmPassword(e.target.value)}
+                          placeholder="សូមបញ្ចូលបញ្ជាក់ពាក្យសម្ងាត់"
+                          required
+                          minLength={6}
+                          className="w-full bg-transparent text-slate-800 text-xs sm:text-sm font-semibold focus:outline-none placeholder:text-slate-400"
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  {/* Error Banner if any */}
+                  {regFormError && (
+                    <div className="p-2.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-2xl font-bold flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                      <span>{regFormError}</span>
+                    </div>
+                  )}
+
+                  {/* PRIMARY ACTION BUTTON */}
+                  <button
+                    type="submit"
+                    disabled={registerSubmitLoading}
+                    className="w-full py-3.5 rounded-full bg-[#4352b2] hover:bg-[#344199] text-white font-extrabold text-sm uppercase tracking-wider shadow-md shadow-indigo-900/20 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2 overflow-hidden"
+                  >
+                    {registerSubmitLoading ? (
+                      <Loader2 className="w-5 h-5 animate-spin text-white" />
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4 text-amber-300" />
+                        <span>ចុះឈ្មោះចូលប្រើ</span>
+                      </>
+                    )}
+                  </button>
+
+                  {/* Secondary Option link to search by student code */}
+                  <div className="text-center pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setRegisterStep("input")}
+                      className="text-xs font-bold text-slate-500 hover:text-[#4352b2] transition-colors cursor-pointer"
+                    >
+                      ឬស្វែងរកតាមលេខសំគាល់សិស្ស (Student ID)
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* STEP 2: INPUT FORM FOR SEARCHING SYSTEM DATA */}
+              {registerStep === "input" && (
+                <form onSubmit={handleRegisterSearchSubmit} className="w-full space-y-3.5 pt-1 text-left">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+                      {registerType === "parent" ? "បញ្ចូលលេខទូរស័ព្ទអាណាព្យាបាល ឬកូដសិស្ស" : "បញ្ចូលលេខសំគាល់សិស្ស (Student ID)"}
+                    </label>
+                    <input
+                      type="text"
+                      value={registerQuery}
+                      onChange={(e) => setRegisterQuery(e.target.value)}
+                      placeholder={registerType === "parent" ? "សូមបញ្ចូលលេខទូរស័ព្ទ ឬកូដសិស្ស..." : "សូមបញ្ចូលលេខសំគាល់សិស្ស..."}
+                      autoFocus
+                      required
+                      className="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white text-slate-800 text-sm font-semibold focus:outline-none focus:ring-4 focus:ring-[#4352b2]/10 focus:border-[#4352b2] transition-all"
+                    />
+                  </div>
+
+                  {/* Instructional guide box */}
+                  <div className="p-3 bg-indigo-50/70 border border-indigo-100 rounded-2xl text-xs text-indigo-900 flex items-start gap-2.5">
+                    <Info className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
+                    <div className="leading-relaxed font-medium">
+                      <span className="font-bold block text-indigo-950 mb-0.5">អក្សរណែនាំ៖</span>
+                      {registerType === "parent"
+                        ? "សូមបញ្ចូលលេខទូរស័ព្ទរបស់អាណាព្យាបាល ឬអត្តលេខសិស្សដែលបានចុះឈ្មោះក្នុងប្រព័ន្ធ ដើម្បីស្វែងរកទិន្នន័យ និងចុះឈ្មោះប្រើប្រាស់។"
+                        : "សូមបញ្ចូលលេខសំគាល់សិស្ស (Student ID) ដែលសាលារៀនបានផ្តល់ជូនដើម្បីបង្កើតគណនីប្រើប្រាស់។"}
+                    </div>
+                  </div>
+
+
+
+                  {registerSearchError && (
+                    <div className="p-2.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-2xl font-bold flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                      <span>{registerSearchError}</span>
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={registerSearchLoading}
+                    className="w-full py-3.5 rounded-full bg-[#4352b2] hover:bg-[#344199] text-white font-extrabold text-sm uppercase tracking-wider shadow-md shadow-indigo-900/20 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    {registerSearchLoading ? (
+                      <Loader2 className="w-5 h-5 animate-spin text-white" />
+                    ) : (
+                      <span>ស្វែងរកព័ត៌មានក្នុងប្រព័ន្ធ</span>
+                    )}
+                  </button>
+                </form>
+              )}
+
+              {/* STEP 3: RESULT MATCHED & PASSWORD CREATION */}
+              {registerStep === "result" && registerSearchResult && (
+                <div className="w-full space-y-3.5 text-left">
+                  <div className="bg-slate-50 border-2 border-emerald-500/30 p-3.5 rounded-2xl shadow-sm space-y-2 max-h-[40vh] overflow-y-auto">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">
+                      រកឃើញទិន្នន័យស្របគ្នា ({registerSearchResult.count})
+                    </span>
+                    {registerSearchResult.data?.map((item: any, idx: number) => (
+                      <div key={idx} className="flex items-center gap-3 pt-1 border-t border-slate-200/60 first:border-0 first:pt-0">
+                        <div className="w-10 h-10 rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-800 font-black shrink-0 overflow-hidden text-xs">
+                          {item.photoUrl ? (
+                            <img src={item.photoUrl} alt="Photo" className="w-full h-full object-cover" />
+                          ) : (
+                            <User className="w-5 h-5" />
+                          )}
+                        </div>
+                        <div>
+                          <div className="text-[11px] font-black text-indigo-700">{item.studentId}</div>
+                          <h4 className="text-xs font-black text-slate-800">{item.nameKh}</h4>
+                          <div className="text-[10px] text-slate-500 font-bold">{item.course} - {item.level}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <form onSubmit={handleRegisterSubmit} className="space-y-3">
+                    <div className="space-y-1">
+                      <label className="text-xs font-black text-slate-700 block uppercase">
+                        បង្កើតពាក្យសម្ងាត់សម្រាប់ចូលប្រើប្រាស់
+                      </label>
+                      <input
+                        type="password"
+                        value={regPassword}
+                        onChange={(e) => setRegPassword(e.target.value)}
+                        placeholder="ពាក្យសម្ងាត់ (យ៉ាងហោច ៦ តួ)"
+                        required
+                        minLength={6}
+                        className="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#4352b2]"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={registerSubmitLoading}
+                      className="w-full py-3.5 rounded-full bg-[#4352b2] hover:bg-[#344199] text-white font-extrabold text-sm uppercase tracking-wider shadow-md shadow-indigo-900/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      {registerSubmitLoading ? (
+                        <Loader2 className="w-5 h-5 animate-spin text-white" />
+                      ) : (
+                        <span>ចុះឈ្មោះ និងបង្កើតគណនី</span>
+                      )}
+                    </button>
+                  </form>
+                </div>
+              )}
+
+              {/* STEP 4: SUCCESS */}
+              {registerStep === "success" && (
+                <div className="w-full space-y-4 text-center py-2">
+                  <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center border-4 border-emerald-200 shadow-md">
+                    <CheckCircle2 className="w-10 h-10" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="text-lg font-black text-emerald-800">ចុះឈ្មោះជោគជ័យ!</h4>
+                    <p className="text-xs font-bold text-slate-600 leading-relaxed px-2">
+                      {registerSuccessMsg || "គណនីរបស់អ្នកត្រូវបានបង្កើត និងភ្ជាប់ទៅប្រព័ន្ធរួចរាល់។"}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsRegisterScreenOpen(false);
+                      setLoginMode("student");
+                    }}
+                    className="w-full py-3.5 rounded-full bg-[#4352b2] hover:bg-[#344199] text-white font-extrabold text-sm uppercase tracking-wider shadow-md cursor-pointer"
+                  >
+                    <span>ចូលប្រើប្រាស់ឥឡូវនេះ</span>
+                  </button>
+                </div>
+              )}
+
+            </div>
+
+            {/* Footer Area with Version */}
+            <div className="pt-4 flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider font-sans border-t border-slate-100 mt-6">
+              <span>©2026 {schoolName || "PLC Computer School"}</span>
+              <span>Version 1.3.6</span>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Guardian / Student Mobile Portal Interface matching Admin Login Form design
+  if (loginMode === "student") {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-slate-100/80 p-3 sm:p-6 font-sans select-none relative overflow-hidden">
+        {/* Decorative Background Glows */}
+        <div className="absolute top-[-10%] left-[-10%] w-96 h-96 rounded-full bg-indigo-200/40 opacity-40 blur-3xl"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-blue-200/30 opacity-40 blur-3xl"></div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="w-full max-w-md bg-white rounded-[32px] sm:rounded-[36px] shadow-2xl shadow-indigo-950/15 border border-slate-200/80 overflow-hidden z-10 relative flex flex-col justify-between"
+        >
+          {/* TOP MODERN GRADIENT HEADER BANNER WITH ABSTRACT WAVE ART */}
+          <div className="w-full bg-gradient-to-br from-[#2b337c] via-[#4352b2] to-[#5967cb] relative pt-4 pb-16 px-4 sm:px-5 border-b border-white/10">
+            
+            {/* Abstract Floating Circles & Wave Overlay clipped to top corners */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-t-[32px] sm:rounded-t-[36px]">
+              <div className="absolute -left-10 -top-10 w-36 h-36 rounded-full bg-black/25 blur-2xs"></div>
+              <div className="absolute -right-8 -top-10 w-48 h-48 rounded-full bg-white/20 backdrop-blur-md"></div>
+              <div className="absolute right-6 top-8 w-28 h-28 rounded-full bg-white/25 shadow-inner"></div>
+              
+              {/* Subtle SVG Wave Lines Overlay */}
+              <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 400 200" fill="none">
+                <path d="M-50,120 C100,60 200,180 450,90 L450,200 L-50,200 Z" fill="white" fillOpacity="0.1" />
+                <path d="M-50,140 C120,80 250,190 450,110 L450,200 L-50,200 Z" fill="white" fillOpacity="0.15" />
+              </svg>
+            </div>
+
+            {/* Top Control Bar with Language Selector */}
+            <div className="relative z-30 flex items-center justify-end w-full mb-3">
+              {/* Clean Integrated Language Selector */}
+              <LanguageSelector className="flex items-center" />
+            </div>
+
+            {/* WELCOME BADGE HEADER TEXT */}
+            <div className="relative z-10 flex items-center justify-center gap-2 max-w-sm mx-auto mt-1 py-1 text-white">
+              <ShieldCheck className="w-4.5 h-4.5 text-amber-300 shrink-0" />
+              <span className="text-sm font-black tracking-wide truncate">
+                {uiLang === 'en' ? 'Welcome to Student & Guardian Portal' : 'សូមស្វាគមន៍! មកកាន់ប្រព័ន្ធសិស្ស និងអាណាព្យាបាល'}
+              </span>
+            </div>
+          </div>
+
+          {/* OVERLAPPING WHITE CONTENT SHEET WITH BIG ROUNDED CORNERS */}
+          <div className="-mt-10 relative z-20 bg-white rounded-t-[32px] sm:rounded-t-[36px] px-6 sm:px-8 pt-7 pb-6 flex-1 flex flex-col justify-between">
+            <div>
+              {/* SCHOOL HEADING MATCHING ADMIN FORM STYLE */}
+              <div className="text-center mb-6">
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-[#4352b2] tracking-tight">
+                  {uiLang === 'en' ? 'PLC Computer School' : 'សាលាកុំព្យូទ័រ ភី អិល ស៊ី'}
+                </h1>
+                <p className="text-xs font-bold text-slate-500 mt-1">
+                  {uiLang === 'en' ? 'Student & Guardian Portal' : 'ចូលប្រព័ន្ធអាណាព្យាបាល និងសិស្ស'}
+                </p>
+              </div>
+
+              {/* Dynamic Error or Success Feedbacks */}
+              <AnimatePresence mode="wait">
+                {error && (
+                  <motion.div
+                    key="error-box"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mb-4 p-3.5 bg-rose-50 border border-rose-200 rounded-2xl text-rose-800 text-xs flex items-start gap-2.5 shadow-xs"
+                  >
+                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
+                    <div className="leading-relaxed text-left">
+                      <div className="font-black text-rose-900">{lt("failed")}</div>
+                      <div className="font-bold mt-0.5">{error}</div>
+                    </div>
+                  </motion.div>
+                )}
+                {successMsg && (
+                  <motion.div
+                    key="success-box"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mb-4 p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800 text-xs flex items-start gap-2.5 shadow-xs"
+                  >
+                    <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600 animate-bounce" />
+                    <div className="leading-relaxed text-left">
+                      <div className="font-black text-emerald-900">{lt("success")}</div>
+                      <div className="font-bold mt-0.5">{successMsg}</div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* STUDENT & GUARDIAN LOGIN FORM */}
+              <form onSubmit={handleSubmit} className="space-y-4">
                 
-                {/* INPUT 1: STUDENT ID OR PHONE (RED BORDER PILL) */}
-                <div className="relative">
-                  <div className={`w-full rounded-full border-2 border-slate-300 bg-white px-4 py-3 flex items-center gap-3 shadow-2xs ${themeCfg.focusRing} transition-all`}>
-                    <User className={`w-5 h-5 ${themeCfg.sloganText} shrink-0`} />
+                {/* FIELD 1: STUDENT ID OR PHONE */}
+                <div className="space-y-1.5 text-left">
+                  <label className="block text-xs font-bold text-slate-500">
+                    {uiLang === 'en' ? 'Student ID or Guardian Phone' : 'លេខកូដសិស្ស ឬ លេខទូរស័ព្ទអាណាព្យាបាល'}
+                  </label>
+                  <div className="relative">
                     <input
                       type="text"
                       value={studentIdInput}
                       onChange={(e) => setStudentIdInput(e.target.value)}
-                      placeholder="បញ្ចូលលេខសម្គាល់សិស្ស ឬលេខទូរស័ព្ទ"
-                      required
+                      placeholder={uiLang === 'en' ? 'Enter Student ID or Guardian Phone...' : 'សូមបញ្ចូលលេខកូដសិស្ស ឬ លេខទូរស័ព្ទ...'}
                       autoFocus
-                      className="w-full bg-transparent text-xs sm:text-sm font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-0 focus:border-none border-0 outline-none shadow-none"
+                      required
+                      className="w-full px-4 py-3 sm:py-3.5 rounded-2xl border border-slate-200/90 bg-white text-slate-800 text-sm font-semibold focus:outline-none focus:ring-4 focus:ring-[#4352b2]/10 focus:border-[#4352b2] transition-all placeholder:text-slate-400/80 shadow-2xs"
                     />
+                  </div>
+                  <div className="p-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-[11px] text-slate-600 flex items-start gap-2">
+                    <Info className="w-3.5 h-3.5 text-[#4352b2] shrink-0 mt-0.5" />
+                    <div className="leading-relaxed">
+                      <span className="font-bold text-slate-800">អក្សរណែនាំ៖ </span>
+                      {uiLang === 'en' 
+                        ? 'Enter registered Student ID or Guardian Phone number to access student portal data.'
+                        : 'សូមបញ្ចូលលេខកូដសិស្ស (Student ID) ឬលេខទូរស័ព្ទអាណាព្យាបាលដែលបានចុះឈ្មោះក្នុងប្រព័ន្ធសាលារៀន។'}
+                    </div>
                   </div>
                 </div>
 
-                {/* INPUT 2: PASSWORD (GRAY BORDER PILL WITH EYE ICON) */}
-                <div className="relative">
-                  <div className={`w-full rounded-full border border-slate-300 bg-white px-4 py-3 flex items-center gap-3 shadow-2xs ${themeCfg.focusRing} transition-all`}>
-                    <Lock className="w-5 h-5 text-slate-400 shrink-0" />
+                {/* FIELD 2: PASSWORD */}
+                <div className="space-y-1.5 text-left">
+                  <label className="block text-xs font-bold text-slate-500">
+                    {uiLang === 'en' ? 'Password' : 'ពាក្យសម្ងាត់'}
+                  </label>
+                  <div className="relative flex items-center">
                     <input
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="សូមបញ្ចូលពាក្យសម្ងាត់"
-                      className="w-full bg-transparent text-xs sm:text-sm font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-0 focus:border-none border-0 outline-none shadow-none"
+                      placeholder={uiLang === 'en' ? 'Enter password' : 'សូមបញ្ចូលពាក្យសម្ងាត់'}
+                      className="w-full pl-4 pr-11 py-3 sm:py-3.5 rounded-2xl border border-slate-200/90 bg-white text-slate-800 text-sm font-semibold focus:outline-none focus:ring-4 focus:ring-[#4352b2]/10 focus:border-[#4352b2] transition-all placeholder:text-slate-400/80 shadow-2xs"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer shrink-0"
+                      className="absolute right-3.5 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
                     >
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
                 </div>
 
-                {/* ERROR FEEDBACK DISPLAY */}
-                {error && (
-                  <div className="p-2.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl font-bold flex items-center gap-2 text-left">
-                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                    <span>{error}</span>
-                  </div>
-                )}
-
-                {/* ACTION BUTTON: GOLD / AMBER PILL ("ចូលប្រើ") */}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
+                {/* LOGIN SUBMIT BUTTON */}
+                <button
                   type="submit"
                   disabled={isLoading}
-                  className="group relative w-full py-3.5 px-6 rounded-full bg-amber-600 hover:bg-amber-700 active:scale-[0.98] text-white font-black text-base tracking-wide shadow-md shadow-amber-500/25 hover:shadow-lg hover:shadow-amber-500/35 border border-amber-300/40 transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 overflow-hidden"
+                  className="w-full py-3.5 rounded-full bg-[#4352b2] hover:bg-[#344199] text-white font-extrabold text-sm uppercase tracking-wider shadow-md shadow-indigo-900/20 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2 disabled:opacity-50"
                 >
                   {isLoading ? (
                     <Loader2 className="w-5 h-5 animate-spin text-white" />
                   ) : (
                     <>
-                      <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-xs ring-1 ring-white/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200">
-                        <UserCheck className="w-4 h-4 text-white stroke-[2.5]" />
-                      </div>
-                      <span className="drop-shadow-xs font-black">ចូលប្រើ</span>
+                      <UserCheck className="w-4.5 h-4.5" />
+                      <span>{uiLang === 'en' ? 'Login to Portal' : 'ចូលប្រើប្រាស់ប្រព័ន្ធ'}</span>
                     </>
                   )}
-                </motion.button>
+                </button>
 
-                {/* FORGOT PASSWORD LINK (OPENS SCREENSHOT PILL BUTTONS FOR GUARDIAN / STUDENT) */}
-                <div className="pt-1">
+                {/* FORGOT PASSWORD & REGISTER LINKS */}
+                <div className="flex items-center justify-between text-xs pt-1 px-1">
                   <button
                     type="button"
                     onClick={() => {
                       setForgotTarget("student");
-                      setIsPortalModalOpen(false);
                       setIsForgotPasswordOpen(true);
                       setForgotStep("select");
                     }}
-                    className="text-blue-700 hover:text-blue-900 font-black text-xs hover:underline cursor-pointer transition-colors"
+                    className="text-[#4352b2] font-bold hover:underline cursor-pointer"
                   >
-                    ភ្លេចពាក្យសម្ងាត់?
+                    {uiLang === 'en' ? 'Forgot Password?' : 'ភ្លេចពាក្យសម្ងាត់?'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsRegisterScreenOpen(true);
+                      setRegisterStep("select");
+                    }}
+                    className="text-slate-600 font-bold hover:text-[#4352b2] hover:underline cursor-pointer"
+                  >
+                    {uiLang === 'en' ? 'Register' : 'ចុះឈ្មោះចូលប្រើ'}
                   </button>
                 </div>
 
-                {/* QUICK PRESETS FOR SYSTEM DEMO */}
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-center gap-2">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">ចូលលឿន៖</span>
-                  <button
-                    type="button"
-                    onClick={() => { setStudentIdInput("RTK0008132"); setPassword("123456"); }}
-                    className="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-800 rounded-full text-[10px] font-bold hover:bg-amber-100 cursor-pointer"
-                  >
-                    សិស្ស RTK0008132
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setStudentIdInput("STU001"); setPassword("123456"); }}
-                    className="px-2.5 py-1 bg-rose-50 border border-rose-200 text-rose-800 rounded-full text-[10px] font-bold hover:bg-rose-100 cursor-pointer"
-                  >
-                    STU001
-                  </button>
-                </div>
+
 
               </form>
             </div>
 
-            {/* 3. BOTTOM FOOTER WITH VERSION */}
-            <div className="w-full flex flex-col items-center mt-auto pt-2">
-              <p className="text-[11px] font-semibold text-slate-400 tracking-wide text-center mb-1">
-                ©2026 {schoolName || "PLC Computer School"}
-              </p>
-              <div className="w-full bg-[#1e293b] text-slate-300 text-[11px] font-mono py-1.5 px-8 text-center shadow-md tracking-wider font-bold">
-                Version 1.3.6
-              </div>
-            </div>
-
-          </div>
-        </div>
-      );
-    }
-
-    // Default Landing view (showing the 3 action buttons)
-    return (
-      <div className="min-h-screen w-full bg-slate-50 font-sans select-none flex flex-col justify-center items-center relative overflow-y-auto sm:py-6 sm:px-4">
-        
-        {/* APP CONTAINER FRAME - Framed beautifully on desktop & mobile */}
-        <div className="w-full max-w-md mx-auto bg-white sm:rounded-[36px] shadow-2xl shadow-slate-900/15 border border-slate-200/80 relative overflow-hidden flex flex-col justify-between min-h-screen sm:min-h-[730px]">
-          
-          {/* TOP CURVED ARC BANNER */}
-          <div className={`w-full ${themeCfg.bannerBg} rounded-b-[45px] sm:rounded-b-[55px] shadow-lg shadow-black/15 relative overflow-hidden border-b-2 border-dashed border-amber-400/80 pt-5 pb-7 px-5 text-center transition-colors duration-300`}>
-            
-            {/* ICT Shadowy Background */}
-            <IctShadowyBackground />
-
-            {/* Top Control Bar (Language Selector Only) */}
-            <div className="relative z-20 flex items-center justify-end max-w-md mx-auto mb-2">
-              {/* Language Selector Pill */}
-              <div className="bg-white/15 backdrop-blur-md rounded-full px-2.5 py-1 border border-white/20 shadow-xs flex items-center">
-                <LanguageSelector className="bg-transparent border-0 text-white shadow-none focus:ring-0 text-xs font-bold" />
-              </div>
-            </div>
-
-            {/* SCHOOL LOGO SEAL CONTAINER */}
-            <div className="relative z-10 my-2">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.4 }}
-                className="w-22 h-22 sm:w-26 sm:h-26 rounded-full bg-white border-[3.5px] border-[#f0ab22] shadow-xl shadow-black/30 mx-auto flex items-center justify-center p-1.5 relative ring-4 ring-amber-400/20"
-              >
-                {schoolLogo ? (
-                  <img src={schoolLogo} alt="School Logo" className="w-full h-full object-contain rounded-full" />
-                ) : (
-                  <div className={`w-full h-full rounded-full ${themeCfg.sealBg} flex flex-col items-center justify-center text-white p-1 text-center border border-amber-300`}>
-                    <svg className="w-10 h-10 text-amber-300 mb-0.5" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    <span className="text-[7.5px] font-black uppercase tracking-tighter leading-none text-amber-200">
-                      {(schoolName || "PLC").split(" ")[0].toUpperCase()}
-                    </span>
-                  </div>
-                )}
-              </motion.div>
-            </div>
-
-            {/* SCHOOL NAME TYPOGRAPHY */}
-            <motion.div
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="relative z-10 mt-3"
-            >
-              <h1 className="text-xl sm:text-2xl font-black text-white tracking-wide font-serif drop-shadow-md leading-tight">
-                {schoolKhmerName || "សាលាកុំព្យូទ័រ ភីអិលស៊ី"}
-              </h1>
-              <p className="text-base sm:text-lg font-bold text-amber-200 font-serif italic tracking-wider mt-0.5 opacity-95">
-                {schoolName || "PLC Computer School"}
-              </p>
-            </motion.div>
-          </div>
-
-          {/* MIDDLE SECTION - SLOGAN & 3 PILL ACTION BUTTONS */}
-          <div className="w-full px-6 py-6 flex flex-col items-center text-center flex-1 justify-center my-auto space-y-5">
-            
-            {/* SLOGAN BADGE WITH ELEGANT GLOW */}
-            <div className="inline-flex flex-col items-center">
-              <h2 className={`${themeCfg.sloganText} font-black text-sm sm:text-base font-battambang tracking-tight drop-shadow-3xs`}>
-                សិក្សាបច្ចេកវិទ្យាឌីជីថល ដើម្បីភាពរីកចម្រើនទៅមុខ
-              </h2>
-              <div className="flex items-center justify-center gap-1.5 mt-1 text-amber-500">
-                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
-                <Star className="w-4 h-4 fill-amber-400 text-amber-500" />
-                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
-              </div>
-            </div>
-
-            {/* 3 PILL ACTION BUTTONS (ELEGANT SCHOOL MANAGEMENT THEME DESIGN) */}
-            <div className="w-full space-y-3.5 mt-2 max-w-xs mx-auto">
-              
-              {/* BUTTON 1: GOLD/AMBER - ACCESS / LOGIN ("ចូលប្រើ") */}
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                type="button"
-                onClick={() => setIsPortalModalOpen(true)}
-                className="group relative w-full py-3.5 px-5 rounded-full bg-amber-600 hover:bg-amber-700 active:scale-[0.98] text-white font-black text-base sm:text-lg tracking-wide shadow-md shadow-amber-500/20 hover:shadow-lg hover:shadow-amber-500/30 border border-amber-300/40 transition-all duration-200 flex items-center justify-between cursor-pointer overflow-hidden"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-xs ring-1 ring-white/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200">
-                    <UserCheck className="w-4.5 h-4.5 text-white stroke-[2.5]" />
-                  </div>
-                  <span className="drop-shadow-xs">ចូលប្រើ</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-white/80 group-hover:text-white group-hover:translate-x-1 transition-all duration-200" />
-              </motion.button>
-
-              {/* BUTTON 2: THEME/SYSTEM - REGISTER ("ចុះឈ្មោះចូលប្រើ") */}
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                type="button"
-                onClick={() => {
-                  setIsRegisterScreenOpen(true);
-                  setRegisterStep("select");
-                }}
-                className="group relative w-full py-3.5 px-5 rounded-full bg-slate-900 hover:bg-slate-950 active:scale-[0.98] text-white font-black text-base sm:text-lg tracking-wide shadow-md shadow-blue-950/25 hover:shadow-lg hover:shadow-blue-950/35 border border-blue-400/30 transition-all duration-200 flex items-center justify-between cursor-pointer overflow-hidden"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-white/15 backdrop-blur-xs ring-1 ring-white/25 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200">
-                    <Sparkles className="w-4.5 h-4.5 text-amber-300 stroke-[2.5]" />
-                  </div>
-                  <span className="drop-shadow-xs">ចុះឈ្មោះចូលប្រើ</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-white/80 group-hover:text-white group-hover:translate-x-1 transition-all duration-200" />
-              </motion.button>
-
-              {/* BUTTON 3: ROYAL BLUE - ABOUT SCHOOL ("អំពីសាលា") */}
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                type="button"
-                onClick={() => setIsAboutModalOpen(true)}
-                className="group relative w-full py-3.5 px-5 rounded-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-black text-base sm:text-lg tracking-wide shadow-md shadow-sky-600/20 hover:shadow-lg hover:shadow-sky-600/30 border border-sky-300/40 transition-all duration-200 flex items-center justify-between cursor-pointer overflow-hidden"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-xs ring-1 ring-white/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200">
-                    <Info className="w-4.5 h-4.5 text-white stroke-[2.5]" />
-                  </div>
-                  <span className="drop-shadow-xs">អំពីសាលា</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-white/80 group-hover:text-white group-hover:translate-x-1 transition-all duration-200" />
-              </motion.button>
-
+            {/* Footer Area with Version */}
+            <div className="pt-4 flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider font-sans border-t border-slate-100 mt-6">
+              <span>©2026 {schoolName || "PLC Computer School"}</span>
+              <span>Version 1.3.6</span>
             </div>
           </div>
+        </motion.div>
 
-          {/* BOTTOM FOOTER WITH VERSION BADGE */}
-          <div className="w-full flex flex-col items-center mt-auto pt-2 pb-4 space-y-1.5">
-            <p className="text-[11px] font-bold text-slate-400 tracking-wide text-center">
-              ©2026 {schoolName || "PLC Computer School"}
-            </p>
-            <div className={`text-white text-[10.5px] font-mono py-1 px-7 rounded-full shadow-md tracking-wider font-bold border border-white/20 ${themeCfg.primaryBtn || "bg-blue-600"}`}>
-              Version 1.3.6
-            </div>
-          </div>
 
-        </div>
-
-        {/* --- MODAL 1: LOGIN DRAWER / FORM MODAL ("ចូលប្រើ") --- */}
-        <AnimatePresence>
-          {isPortalModalOpen && (
-            <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
-              <motion.div
-                initial={{ y: 100, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: 100, opacity: 0 }}
-                className="w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 relative border border-slate-100"
-              >
-                <button
-                  type="button"
-                  onClick={() => setIsPortalModalOpen(false)}
-                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-11 h-11 rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow-md shadow-amber-500/20 shrink-0">
-                    <User className="w-6 h-6 stroke-[2.2]" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-black text-slate-800">ចូលប្រព័ន្ធអាណាព្យាបាល និងសិស្ស</h3>
-                    <p className="text-xs text-slate-400 font-medium">បញ្ចូលព័ត៌មានដើម្បីមើលរបាយការណ៍ និងវត្តមាន</p>
-                  </div>
-                </div>
-
-                <form onSubmit={handleSubmit} className="space-y-4 my-2">
-                  <div className="space-y-1.5">
-                    <label className="block text-[11px] font-black text-slate-700 uppercase tracking-wider">
-                      លេខកូដសិស្ស ឬ លេខទូរស័ព្ទអាណាព្យាបាល
-                    </label>
-                    <div className="relative">
-                      <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
-                      <input
-                        type="text"
-                        value={studentIdInput}
-                        onChange={(e) => setStudentIdInput(e.target.value)}
-                        placeholder="ឧ. STU001 ឬ 012345678"
-                        autoFocus
-                        required
-                        className="w-full pl-10 pr-4 py-3 rounded-2xl border border-slate-200 bg-slate-50/50 text-slate-800 text-xs font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all placeholder-slate-400"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Quick Preset Buttons */}
-                  <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100/80">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">
-                      ចូលរហ័សគំរូ (Quick Demo Presets)
-                    </span>
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setStudentIdInput("STU001")}
-                        className="flex-1 py-1.5 px-2 bg-white border border-amber-200 text-amber-700 rounded-xl text-[10.5px] font-bold hover:bg-amber-50 transition-colors shadow-3xs cursor-pointer"
-                      >
-                        ⚡ សិស្ស (STU001)
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setStudentIdInput("012345678")}
-                        className="flex-1 py-1.5 px-2 bg-white border border-blue-200 text-blue-700 rounded-xl text-[10.5px] font-bold hover:bg-blue-50 transition-colors shadow-3xs cursor-pointer"
-                      >
-                        ⚡ អាណាព្យាបាល (012345678)
-                      </button>
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full py-3.5 rounded-full bg-[#f39c12] hover:bg-[#e08e0b] text-white font-black text-sm uppercase tracking-wider shadow-md active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
-                  >
-                    <span>ចូលប្រើប្រាស់ប្រព័ន្ធ</span>
-                  </button>
-                </form>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
 
         {/* --- MODAL 2: REGISTER MODAL ("ចុះឈ្មោះចូលប្រើ") --- */}
         <AnimatePresence>
@@ -2442,146 +2025,101 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
 
   // Staff Login View (for Admin & Teachers)
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-slate-50 p-4 font-sans select-none relative overflow-hidden">
-      {/* Decorative Background Elements */}
-      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 rounded-full bg-primary-200/40 opacity-30 blur-3xl"></div>
+    <div className="min-h-screen w-full flex items-center justify-center bg-slate-100/80 p-3 sm:p-6 font-sans select-none relative overflow-hidden">
+      {/* Decorative Background Glows */}
+      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 rounded-full bg-indigo-200/40 opacity-40 blur-3xl"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-blue-200/30 opacity-40 blur-3xl"></div>
 
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="w-full max-w-lg bg-white rounded-3xl sm:rounded-[36px] shadow-2xl shadow-slate-900/15 border border-slate-200/80 overflow-hidden z-10 relative flex flex-col justify-between"
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="w-full max-w-md bg-white rounded-[32px] sm:rounded-[36px] shadow-2xl shadow-indigo-950/15 border border-slate-200/80 overflow-hidden z-10 relative flex flex-col justify-between"
       >
-        {/* TOP CURVED ARC BANNER (GUARDIAN / SCHOOL SEAL STYLE) */}
-        <div className={`w-full ${themeCfg.bannerBg} rounded-b-[45px] sm:rounded-b-[55px] shadow-lg shadow-black/15 relative overflow-hidden border-b-2 border-dashed border-amber-400/80 pt-5 pb-7 px-5 text-center transition-colors duration-300`}>
+        {/* TOP MODERN GRADIENT HEADER BANNER WITH ABSTRACT WAVE ART */}
+        <div className="w-full bg-gradient-to-br from-[#2b337c] via-[#4352b2] to-[#5967cb] relative pt-4 pb-16 px-4 sm:px-5 border-b border-white/10">
           
-          {/* ICT Shadowy Background */}
-          <IctShadowyBackground />
-
-          {/* Top Control Bar (Language Selector Only) */}
-          <div className="relative z-20 flex items-center justify-end max-w-md mx-auto mb-2">
-            {/* Language Selector Pill */}
-            <div className="bg-white/15 backdrop-blur-md rounded-full px-2.5 py-1 border border-white/20 shadow-xs flex items-center">
-              <LanguageSelector className="bg-transparent border-0 text-white shadow-none focus:ring-0 text-xs font-bold" />
-            </div>
+          {/* Abstract Floating Circles & Wave Overlay clipped to top corners */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-t-[32px] sm:rounded-t-[36px]">
+            <div className="absolute -left-10 -top-10 w-36 h-36 rounded-full bg-black/25 blur-2xs"></div>
+            <div className="absolute -right-8 -top-10 w-48 h-48 rounded-full bg-white/20 backdrop-blur-md"></div>
+            <div className="absolute right-6 top-8 w-28 h-28 rounded-full bg-white/25 shadow-inner"></div>
+            
+            {/* Subtle SVG Wave Lines Overlay */}
+            <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 400 200" fill="none">
+              <path d="M-50,120 C100,60 200,180 450,90 L450,200 L-50,200 Z" fill="white" fillOpacity="0.1" />
+              <path d="M-50,140 C120,80 250,190 450,110 L450,200 L-50,200 Z" fill="white" fillOpacity="0.15" />
+            </svg>
           </div>
 
-          {/* SCHOOL LOGO SEAL CONTAINER */}
-          <div className="relative z-10 my-2">
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.4 }}
-              className="w-22 h-22 sm:w-26 sm:h-26 rounded-full bg-white border-[3.5px] border-[#f0ab22] shadow-xl shadow-black/30 mx-auto flex items-center justify-center p-1.5 relative ring-4 ring-amber-400/20"
-            >
-              {schoolLogo ? (
-                <img src={schoolLogo} alt="School Logo" className="w-full h-full object-contain rounded-full" />
-              ) : (
-                <div className={`w-full h-full rounded-full ${themeCfg.sealBg} flex flex-col items-center justify-center text-white p-1 text-center border border-amber-300`}>
-                  <svg className="w-10 h-10 text-amber-300 mb-0.5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                  <span className="text-[7.5px] font-black uppercase tracking-tighter leading-none text-amber-200">
-                    {(schoolName || "PLC").split(" ")[0].toUpperCase()}
-                  </span>
-                </div>
+          {/* Top Control Bar with Language Selector */}
+          <div className="relative z-30 flex items-center justify-end w-full mb-3">
+            {/* Clean Integrated Language Selector */}
+            <LanguageSelector className="flex items-center" />
+          </div>
+
+          {/* WELCOME BADGE HEADER TEXT */}
+          <div className="relative z-10 flex items-center justify-center gap-2 max-w-sm mx-auto mt-1 py-1 text-white">
+            <ShieldCheck className="w-4.5 h-4.5 text-amber-300 shrink-0" />
+            <span className="text-sm font-black tracking-wide truncate">
+              {uiLang === 'en' ? 'Welcome! to Management System' : 'សូមស្វាគមន៍! មកកាន់ប្រព័ន្ធគ្រប់គ្រង'}
+            </span>
+          </div>
+        </div>
+
+        {/* OVERLAPPING WHITE CONTENT SHEET WITH BIG ROUNDED CORNERS */}
+        <div className="-mt-10 relative z-20 bg-white rounded-t-[32px] sm:rounded-t-[36px] px-6 sm:px-8 pt-7 pb-6 flex-1 flex flex-col justify-between">
+          <div>
+            {/* SCHOOL HEADING MATCHING REQUESTED TEXT */}
+            <div className="text-center mb-6">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#4352b2] tracking-tight">
+                {uiLang === 'en' ? 'PLC Computer School' : 'សាលាកុំព្យូទ័រ ភី អិល ស៊ី'}
+              </h1>
+            </div>
+
+            {/* Dynamic Error or Success Feedbacks */}
+            <AnimatePresence mode="wait">
+              {error && (
+                <motion.div
+                  key="error-box"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="mb-4 p-3.5 bg-rose-50 border border-rose-200 rounded-2xl text-rose-800 text-xs flex items-start gap-2.5 shadow-xs"
+                >
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
+                  <div className="leading-relaxed text-left">
+                    <div className="font-black text-rose-900">{lt("failed")}</div>
+                    <div className="font-bold mt-0.5">{error}</div>
+                  </div>
+                </motion.div>
               )}
-            </motion.div>
-          </div>
+              {successMsg && (
+                <motion.div
+                  key="success-box"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="mb-4 p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800 text-xs flex items-start gap-2.5 shadow-xs"
+                >
+                  <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600 animate-bounce" />
+                  <div className="leading-relaxed text-left">
+                    <div className="font-black text-emerald-900">{lt("success")}</div>
+                    <div className="font-bold mt-0.5">{successMsg}</div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-          {/* SCHOOL NAME TYPOGRAPHY */}
-          <motion.div
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="relative z-10 mt-3"
-          >
-            <h1 className="text-xl sm:text-2xl font-black text-white tracking-wide font-serif drop-shadow-md leading-tight">
-              {schoolKhmerName || "សាលាកុំព្យូទ័រ ភីអិលស៊ី"}
-            </h1>
-            <p className="text-base sm:text-lg font-bold text-amber-200 font-serif italic tracking-wider mt-0.5 opacity-95">
-              {schoolName || "PLC Computer School"}
-            </p>
-          </motion.div>
-        </div>
-
-        {/* SLOGAN BADGE WITH 3 STARS */}
-        <div className="w-full px-6 pt-4 flex flex-col items-center text-center">
-          <div className="inline-flex flex-col items-center">
-            <h2 className={`${themeCfg.sloganText} font-black text-sm sm:text-base font-battambang tracking-tight drop-shadow-3xs`}>
-              សិក្សាបច្ចេកវិទ្យាឌីជីថល ដើម្បីភាពរីកចម្រើនទៅមុខ
-            </h2>
-            <div className="flex items-center justify-center gap-1.5 mt-1 text-amber-500">
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
-              <Star className="w-4 h-4 fill-amber-400 text-amber-500" />
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
-            </div>
-          </div>
-        </div>
-
-        <div className="p-6 sm:p-8 pt-4">
-
-          {/* Tabular Header Divider */}
-          <div className="flex items-center gap-2 mb-5">
-            <div className="h-[1px] flex-1 bg-slate-100"></div>
-            <div className="flex items-center gap-1.5 px-3 md:px-4 py-1.5 bg-slate-50 rounded-2xl md:rounded-full border border-slate-200/40 min-w-0">
-              <Lock className="w-3.5 h-3.5 text-primary-600 shrink-0" />
-              <span className="text-[9.5px] md:text-[10.5px] font-extrabold text-slate-500 uppercase tracking-wider leading-tight text-center md:text-left">
-                {lt("secureLogin")}
-              </span>
-            </div>
-            <div className="h-[1px] flex-1 bg-slate-100"></div>
-          </div>
-
-          {/* Dynamic Feedbacks with AnimatePresence */}
-          <AnimatePresence mode="wait">
-            {error && (
-              <motion.div
-                key="error-box"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="mb-5 p-4 bg-rose-50 border border-rose-200 rounded-2xl text-rose-800 text-xs flex items-start gap-2.5 shadow-sm"
-              >
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
-                <div className="leading-relaxed">
-                  <div className="font-black text-rose-900">{lt("failed")}</div>
-                  <div className="font-bold mt-0.5">{error}</div>
-                </div>
-              </motion.div>
-            )}
-            {successMsg && (
-              <motion.div
-                key="success-box"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="mb-5 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800 text-xs flex items-start gap-2.5 shadow-sm"
-              >
-                <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600 animate-bounce" />
-                <div className="leading-relaxed">
-                  <div className="font-black text-emerald-900">{lt("success")}</div>
-                  <div className="font-bold mt-0.5">{successMsg}</div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-
-
-          {/* Login Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-4">
-              {/* Input 1: Email/Username */}
-              <div className="space-y-1.5">
-                <label className="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wide">
-                  {lt("usernameLabel")}
+            {/* MAIN LOGIN FORM MATCHING SCREENSHOT */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              
+              {/* FIELD 1: EMAIL / USERNAME */}
+              <div className="space-y-1.5 text-left">
+                <label className="block text-xs font-bold text-slate-500">
+                  {uiLang === 'en' ? 'Email' : 'ឈ្មោះគណនី ឬ អ៊ីម៉ែល'}
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                    <User className="w-4 h-4" />
-                  </span>
                   <input
                     type="text"
                     value={email}
@@ -2589,27 +2127,22 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
                       setEmail(e.target.value);
                       if (autofillSource) setAutofillSource(null);
                     }}
-                    placeholder={lt("exampleUser")}
+                    placeholder={uiLang === 'en' ? 'kristin.watson@example.com' : 'សូមបញ្ចូលឈ្មោះគណនី ឬ អ៊ីម៉ែល'}
                     autoFocus
-                    className={`w-full pl-10 pr-4 py-3 rounded-2xl border bg-slate-50/50 text-slate-800 text-xs font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all placeholder-slate-400/90 ${
-                      autofillSource ? "border-primary-400 bg-primary-50/30 ring-2 ring-primary-500/15" : "border-slate-200"
-                    }`}
                     required
+                    className={`w-full px-4 py-3 sm:py-3.5 rounded-2xl border bg-white text-slate-800 text-sm font-semibold focus:outline-none focus:ring-4 focus:ring-[#4352b2]/10 focus:border-[#4352b2] transition-all placeholder:text-slate-400/80 shadow-2xs ${
+                      autofillSource ? "border-[#4352b2] bg-indigo-50/20 ring-2 ring-[#4352b2]/20" : "border-slate-200/90"
+                    }`}
                   />
                 </div>
               </div>
 
-              {/* Input 2: Password */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wide">
-                    {lt("passwordLabel")}
-                  </label>
-                </div>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                    <KeyRound className="w-4 h-4" />
-                  </span>
+              {/* FIELD 2: PASSWORD */}
+              <div className="space-y-1.5 text-left">
+                <label className="block text-xs font-bold text-slate-500">
+                  {uiLang === 'en' ? 'Password' : 'ពាក្យសម្ងាត់'}
+                </label>
+                <div className="relative flex items-center">
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
@@ -2617,37 +2150,37 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
                       setPassword(e.target.value);
                       if (autofillSource) setAutofillSource(null);
                     }}
-                    placeholder={lt("enterPass")}
-                    className={`w-full pl-10 pr-12 py-3 rounded-2xl border bg-slate-50/50 text-slate-800 text-xs font-mono font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all placeholder-slate-400/95 ${
-                      autofillSource ? "border-primary-400 bg-primary-50/30 ring-2 ring-primary-500/15" : "border-slate-200"
-                    }`}
+                    placeholder={uiLang === 'en' ? '••••••••••••' : '••••••••••••'}
                     required
+                    className={`w-full pl-4 pr-11 py-3 sm:py-3.5 rounded-2xl border bg-white text-slate-800 text-sm font-semibold focus:outline-none focus:ring-4 focus:ring-[#4352b2]/10 focus:border-[#4352b2] transition-all placeholder:text-slate-400/80 shadow-2xs ${
+                      autofillSource ? "border-[#4352b2] bg-indigo-50/20 ring-2 ring-[#4352b2]/20" : "border-slate-200/90"
+                    }`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none cursor-pointer"
+                    className="absolute right-3.5 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none cursor-pointer p-1"
                   >
                     {showPassword ? (
-                      <EyeOff className="w-4.5 h-4.5" />
+                      <EyeOff className="w-5 h-5" />
                     ) : (
-                      <Eye className="w-4.5 h-4.5" />
+                      <Eye className="w-5 h-5" />
                     )}
                   </button>
                 </div>
               </div>
 
-              {/* Utilities: Remember Me & Forgot Password */}
-              <div className="flex items-center justify-between pt-1 pb-2">
+              {/* UTILITIES: REMEMBER ME & FORGOT PASSWORD */}
+              <div className="flex items-center justify-between pt-1 pb-1">
                 <label className="flex items-center gap-2 cursor-pointer group">
                   <input
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 rounded text-primary-600 border-slate-300 focus:ring-primary-500/30 focus:ring-offset-0 accent-primary-600 cursor-pointer"
+                    className="w-4 h-4 rounded-md text-[#4352b2] border-slate-300 focus:ring-[#4352b2]/30 accent-[#4352b2] cursor-pointer"
                   />
-                  <span className="text-[11px] font-black text-slate-500 group-hover:text-slate-700 transition-colors">
-                    {lt("rememberMe")}
+                  <span className="text-xs font-bold text-slate-500 group-hover:text-slate-700 transition-colors">
+                    {uiLang === 'en' ? 'Remember me' : 'ចងចាំគណនី'}
                   </span>
                 </label>
                 <button
@@ -2657,115 +2190,38 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
                     setIsForgotPasswordOpen(true);
                     setForgotStep("select");
                   }}
-                  className="text-[11px] font-black text-primary-600 hover:text-primary-800 hover:underline cursor-pointer transition-colors"
+                  className="text-xs font-extrabold text-[#4352b2] hover:text-[#2a347d] hover:underline cursor-pointer transition-colors"
                 >
-                  ភ្លេចពាក្យសម្ងាត់?
+                  {uiLang === 'en' ? 'Forgot password?' : 'ភ្លេចពាក្យសម្ងាត់?'}
                 </button>
               </div>
-            </div>
 
-            {/* Submit Button */}
-            <motion.button
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
-              type="submit"
-              disabled={isLoading}
-              className="w-full py-3.5 rounded-2xl text-white font-black text-[11px] uppercase tracking-wider bg-primary-600 hover:bg-primary-700 transition-all shadow-md active:scale-98 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-85"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4.5 h-4.5 animate-spin" />
-                  <span>{lt("verifying")}</span>
-                </>
-              ) : (
-                <span>{lt("submitButton")}</span>
-              )}
-            </motion.button>
-          </form>
-
-          {/* Account Management & Demo Presets section */}
-          <div className="mt-8 border-t border-slate-100 pt-6">
-            <div className="flex items-center gap-1.5 mb-4 justify-center">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary-500"></span>
-              <h3 className="text-[11px] font-black text-slate-600 uppercase tracking-wider">
-                {lt("demoTitle")}
-              </h3>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Presets Item 1: Admin */}
-              <div className="bg-primary-50/40 border border-primary-100/60 rounded-2xl p-3.5 flex flex-col justify-between hover:bg-primary-50/80 transition-all group relative overflow-hidden">
-                <div className="absolute -right-3 -top-3 w-10 h-10 bg-primary-100/50 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <ShieldCheck className="w-5 h-5 text-primary-500/70" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[11px] font-black text-primary-900">{lt("adminRole")}</span>
-                    <span className="text-[7.5px] bg-primary-600 text-white font-extrabold px-1 py-0.2 rounded uppercase">FULL</span>
-                  </div>
-                  <div className="text-[9px] text-slate-400 font-semibold mt-1">{lt("adminDesc")}</div>
-                  <div className="bg-white/80 border border-slate-100 rounded-xl px-2.5 py-1.5 mt-2.5 font-mono text-[9.5px] text-slate-700 leading-snug">
-                    <div>User: <strong className="text-slate-900">admin</strong></div>
-                    <div>Pass: <strong className="text-slate-900">admin123</strong></div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-1.5 mt-3 pt-1 border-t border-primary-100/30">
-                  <button
-                    type="button"
-                    onClick={() => handleAutofill("admin", false)}
-                    className="py-1.5 bg-white border border-primary-200 text-primary-700 text-[9px] font-black rounded-lg hover:bg-primary-50 transition-colors shadow-sm uppercase tracking-wider"
-                  >
-                    {lt("fillBtn")}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleAutofill("admin", true)}
-                    className="py-1.5 bg-primary-600 text-white text-[9px] font-black rounded-lg hover:bg-primary-700 transition-colors shadow-sm uppercase tracking-wider"
-                  >
-                    {lt("quickBtn")}
-                  </button>
-                </div>
-              </div>
-
-              {/* Presets Item 2: Teacher */}
-              <div className="bg-blue-50/40 border border-blue-100/60 rounded-2xl p-3.5 flex flex-col justify-between hover:bg-blue-50/80 transition-all group relative overflow-hidden">
-                <div className="absolute -right-3 -top-3 w-10 h-10 bg-blue-100/50 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <GraduationCap className="w-5 h-5 text-blue-500/70" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[11px] font-black text-blue-900">{lt("teacherRole")}</span>
-                    <span className="text-[7.5px] bg-blue-600 text-white font-extrabold px-1 py-0.2 rounded uppercase">LIMIT</span>
-                  </div>
-                  <div className="text-[9px] text-slate-400 font-semibold mt-1">{lt("teacherDesc")}</div>
-                  <div className="bg-white/80 border border-slate-100 rounded-xl px-2.5 py-1.5 mt-2.5 font-mono text-[9.5px] text-slate-700 leading-snug">
-                    <div>User: <strong className="text-slate-900">teacher@plc.com</strong></div>
-                    <div>Pass: <strong className="text-slate-900">teacher123</strong></div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-1.5 mt-3 pt-1 border-t border-blue-100/30">
-                  <button
-                    type="button"
-                    onClick={() => handleAutofill("teacher", false)}
-                    className="py-1.5 bg-white border border-blue-200 text-blue-700 text-[9px] font-black rounded-lg hover:bg-blue-50 transition-colors shadow-sm uppercase tracking-wider"
-                  >
-                    {lt("fillBtn")}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleAutofill("teacher", true)}
-                    className="py-1.5 bg-blue-600 text-white text-[9px] font-black rounded-lg hover:bg-blue-700 transition-colors shadow-sm uppercase tracking-wider"
-                  >
-                    {lt("quickBtn")}
-                  </button>
-                </div>
-              </div>
-            </div>
+              {/* ACTION BUTTON: FULL WIDTH INDIGO BLUE PILL ("Sign in" / "ចូលប្រើប្រាស់") */}
+              <motion.button
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3.5 sm:py-4 rounded-2xl bg-[#4352b2] hover:bg-[#323e91] active:scale-[0.98] text-white font-extrabold text-base tracking-wide shadow-lg shadow-[#4352b2]/25 hover:shadow-xl hover:shadow-[#4352b2]/35 transition-all cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin text-white" />
+                    <span>{lt("verifying")}</span>
+                  </>
+                ) : (
+                  <span>{uiLang === 'en' ? 'Sign in' : 'ចូលប្រើប្រាស់'}</span>
+                )}
+              </motion.button>
+            </form>
           </div>
-        </div>
-        
-        {/* Footer Area with Version */}
-        <div className="bg-slate-50 px-8 py-4 border-t border-slate-100/80 flex items-center justify-end text-[10.5px] font-bold text-slate-400 uppercase tracking-wider font-sans">
-          <span>{lt("version")}</span>
+
+          {/* Footer Area with Version */}
+          <div className="pt-4 flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider font-sans border-t border-slate-100 mt-4">
+            <span>©2026 {schoolName || "PLC Computer School"}</span>
+            <span>{lt("version")}</span>
+          </div>
+
         </div>
       </motion.div>
     </div>

@@ -68,49 +68,53 @@ export default function LanguageSelector({ className = '' }: { className?: strin
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-8.5 h-8.5 sm:w-9 sm:h-9 rounded-xl bg-white/20 hover:bg-white/30 text-white border border-white/30 shadow-3xs flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 shrink-0 focus:outline-none"
+        className="flex items-center gap-1.5 px-1 py-1 text-white hover:text-white/80 cursor-pointer transition-all duration-200 active:scale-95 shrink-0 focus:outline-none"
         aria-haspopup="true"
         aria-expanded={isOpen}
+        title={currentLang === 'kh' ? 'ជ្រើសរើសភាសា' : 'Select Language'}
       >
-        <div className="w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-md overflow-hidden border border-white/40 flex items-center justify-center shrink-0 bg-white">
+        <div className="w-4.5 h-4.5 rounded-full overflow-hidden flex items-center justify-center shrink-0 border border-white/40 shadow-2xs">
           <img src={selectedLang.flag} alt="" className="w-full h-full object-cover scale-110" />
         </div>
+        <span className="text-[11px] font-black tracking-wider uppercase font-sans leading-none">{selectedLang.code}</span>
+        <ChevronDown className={`w-3 h-3 text-white/80 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 8, scale: 0.98 }}
+            initial={{ opacity: 0, y: 6, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8, scale: 0.98 }}
+            exit={{ opacity: 0, y: 6, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 z-[100] mt-2 w-48 origin-top-right bg-white rounded-[20px] shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 overflow-hidden"
+            className="absolute right-0 z-[999] mt-2 w-48 origin-top-right bg-white rounded-2xl shadow-xl border border-slate-200/90 overflow-hidden text-slate-800"
           >
-            <div className="px-4 py-3 border-b border-slate-50">
-              <p className="text-[11px] font-bold text-slate-400 tracking-wide">
+            <div className="px-3.5 py-2.5 bg-slate-50/90 border-b border-slate-100 flex items-center justify-between">
+              <p className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
                 {currentLang === 'kh' ? 'ជ្រើសរើសភាសា' : 'Select Language'}
               </p>
             </div>
-            <div className="p-1.5">
+            <div className="p-1.5 space-y-0.5">
               {LANGUAGES.map((lang) => {
                 const isSelected = currentLang === lang.code;
                 return (
                   <button
                     key={lang.code}
+                    type="button"
                     onClick={() => changeLanguage(lang.code)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[13px] font-bold transition-colors ${
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-primary-50/80 text-primary-700'
-                        : 'text-slate-700 hover:bg-slate-50'
+                        ? 'bg-indigo-50 text-[#4352b2]'
+                        : 'text-slate-700 hover:bg-slate-100/70'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
-                      <div className="w-[22px] h-[22px] rounded-md overflow-hidden border border-slate-200 flex items-center justify-center shrink-0 bg-white">
+                      <div className="w-5 h-5 rounded-full overflow-hidden border border-slate-200/80 flex items-center justify-center shrink-0 bg-white shadow-2xs">
                         <img src={lang.flag} alt="" className="w-full h-full object-cover scale-110" />
                       </div>
-                      <span className="pb-0.5">{lang.label}</span>
+                      <span className="font-sans">{lang.label}</span>
                     </div>
-                    {isSelected && <Check className="w-4 h-4 text-primary-600" strokeWidth={3} />}
+                    {isSelected && <Check className="w-4 h-4 text-[#4352b2]" strokeWidth={2.5} />}
                   </button>
                 );
               })}

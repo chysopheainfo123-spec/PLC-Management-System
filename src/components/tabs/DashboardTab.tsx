@@ -193,7 +193,7 @@ export default function DashboardTab(props: any) {
                           {schoolLogo ? (
                             <img src={schoolLogo} alt="School Logo" className="w-full h-full object-contain rounded-full" />
                           ) : (
-                            <div className="w-full h-full rounded-full bg-[#8f1218] flex flex-col items-center justify-center text-white text-center p-1 border border-amber-300">
+                            <div className="w-full h-full rounded-full bg-blue-900 flex flex-col items-center justify-center text-white text-center p-1 border border-amber-300">
                               <GraduationCap className="w-7 h-7 text-amber-300 mb-0.5" />
                               <span className="text-[7px] font-black uppercase tracking-tighter text-amber-200">
                                 {(schoolName || "PLC").split(" ")[0].toUpperCase()}

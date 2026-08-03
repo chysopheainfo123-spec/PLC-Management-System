@@ -555,29 +555,86 @@ if (typeof window !== "undefined") {
 
     // Mock Auth Login
     if (path === "/api/auth/login" && method === "POST") {
-      const email = (body.email || "").trim().toLowerCase();
-      const password = (body.password || "").trim();
-      
-      const isAdmin = (email === "admin" && (password === "admin123" || password === "admin")) || email === "admin@plc.com";
-      const isTeacher = (email === "teacher" && password === "teacher123") || email === "teacher@plc.com";
-      
-      if (isAdmin || isTeacher) {
-        const role = isAdmin ? "ADMIN" : "TEACHER";
-        const user = {
-          id: isAdmin ? "demo-admin" : "demo-teacher",
-          email: isAdmin ? "admin@plc.com" : "teacher@plc.com",
-          name: isAdmin ? "Admin (Demo Mode)" : "Teacher (Demo Mode)",
-          role: role
-        };
-        // Persist session user info so auth/me works too
-        localStorage.setItem("plc_user", JSON.stringify(user));
-        return createMockResponse({
-          token: "demo_auth_token_bypass",
-          user
-        });
-      } else {
-        return createMockResponse({ message: "ឈ្មោះអ្នកប្រើប្រាស់ ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ! (Incorrect username or password!)" }, 401);
+      const inputLogin = (body.email || "").trim();
+      const inputPassword = (body.password || "").trim();
+
+      if (!inputLogin || !inputPassword) {
+        return createMockResponse({ message: "សូមបញ្ចូលឈ្មោះគណនី និងលេខសម្ងាត់!" }, 400);
       }
+
+      // Check stored local users in localStorage
+      let localUsers: any[] = [];
+      try {
+        const raw = localStorage.getItem("plc_local_users");
+        if (raw) localUsers = JSON.parse(raw);
+      } catch (e) {}
+
+      // Built-in demo accounts
+      const builtIns = [
+        { email: "admin@plc.com", alias: "admin", pass: "admin123", role: "ADMIN", name: "Admin", status: "ACTIVE" },
+        { email: "admin@plc.com", alias: "admin", pass: "admin", role: "ADMIN", name: "Admin", status: "ACTIVE" },
+        { email: "teacher@plc.com", alias: "teacher", pass: "teacher123", role: "TEACHER", name: "Teacher", status: "ACTIVE" }
+      ];
+
+      // Find user record (case-insensitive search to check existence & status first)
+      const userFromLocal = localUsers.find(u => {
+        const uEm = (u.email || "").trim().toLowerCase();
+        const uId = (u.studentId || u.teacherId || u.id || "").trim().toLowerCase();
+        const inL = inputLogin.toLowerCase();
+        return uEm === inL || uId === inL || uEm.split("@")[0] === inL;
+      });
+
+      const builtInCandidate = builtIns.find(b => {
+        const inL = inputLogin.toLowerCase();
+        return b.email.toLowerCase() === inL || b.alias.toLowerCase() === inL;
+      });
+
+      const candidate = userFromLocal || builtInCandidate;
+
+      if (!candidate) {
+        return createMockResponse({ message: "មិនមានគណនីនេះក្នុងប្រព័ន្ធទេ! (Account not found in system)" }, 404);
+      }
+
+      // 1. Authorization Status Check
+      if (candidate.status && (candidate.status.toUpperCase() === "INACTIVE" || candidate.status.toUpperCase() === "SUSPENDED" || candidate.status.toUpperCase() === "DROPPED")) {
+        return createMockResponse({ message: "គណនីរបស់អ្នកត្រូវបានផ្អាក ឬមិនទាន់ទទួលបានសិទ្ធិអនុញ្ញាតឱ្យចូលប្រើប្រាស់ឡើយ! (Account suspended or unauthorized!)" }, 403);
+      }
+
+      // 2. Strict Case Sensitivity Check on Username / Email / ID
+      let validCaseMatch = false;
+      if (userFromLocal) {
+        const uEm = (userFromLocal.email || "").trim();
+        const uPrefix = uEm.includes("@") ? uEm.split("@")[0] : uEm;
+        const uId = (userFromLocal.studentId || userFromLocal.teacherId || userFromLocal.id || "").trim();
+        validCaseMatch = (uEm === inputLogin) || (uPrefix === inputLogin) || (uId === inputLogin);
+      } else if (builtInCandidate) {
+        validCaseMatch = (builtInCandidate.email === inputLogin) || (builtInCandidate.alias === inputLogin);
+      }
+
+      if (!validCaseMatch) {
+        return createMockResponse({ message: "ឈ្មោះអ្នកប្រើប្រាស់/អ៊ីម៉ែល ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ! (សូមពិនិត្យមើលអក្សរធំ-តូច Case sensitive requirement)" }, 401);
+      }
+
+      // 3. Strict Case Sensitivity Check on Password
+      const expectedPass = candidate.password || candidate.pass || candidate.passwordHash;
+      if (expectedPass && inputPassword !== expectedPass) {
+        return createMockResponse({ message: "លេខសម្ងាត់មិនត្រឹមត្រូវ! (សូមពិនិត្យមើលអក្សរធំ-តូច Incorrect password)" }, 401);
+      }
+
+      const role = candidate.role || "STAFF";
+      const userObj = {
+        id: candidate.id || (role === "ADMIN" ? "demo-admin" : "demo-teacher"),
+        email: candidate.email || (role === "ADMIN" ? "admin@plc.com" : "teacher@plc.com"),
+        name: candidate.fullName || candidate.name || (role === "ADMIN" ? "Admin" : "Teacher"),
+        role: role
+      };
+
+      localStorage.setItem("plc_user", JSON.stringify(userObj));
+      return createMockResponse({
+        token: "demo_auth_token_bypass",
+        user: userObj,
+        message: "ការចូលប្រើប្រាស់ជោគជ័យ!"
+      });
     }
 
     // Fallback default response

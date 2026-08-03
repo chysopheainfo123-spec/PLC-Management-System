@@ -1354,7 +1354,7 @@ export default function Dashboard({ user, token, onLogout }: DashboardProps) {
   } | null>(null);
 
   // MySQL Live Integration States
-  const [mysqlHost, setMysqlHost] = useState("localhost");
+  const [mysqlHost, setMysqlHost] = useState("");
   const [mysqlDbName, setMysqlDbName] = useState("plc_school_db");
   const [mysqlPort, setMysqlPort] = useState("3306");
   const [mysqlUser, setMysqlUser] = useState("root");

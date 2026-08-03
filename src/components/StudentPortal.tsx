@@ -4,7 +4,7 @@ import {
   ArrowLeft, Loader2, CheckCircle, Calendar, CreditCard, Award, FileText, Check,
   Bell, Plus, BookOpen, Megaphone, Globe, QrCode, Search, ChevronRight, X, Phone, MapPin,
   Clock, AlertCircle, Send, User, ChevronDown, RefreshCw, BarChart3, Star, LogOut,
-  Camera, Upload, Save, Sparkles, ImageIcon
+  Camera, Upload, Save, Sparkles, ImageIcon, ShieldCheck, Printer, Download, Receipt, ExternalLink, Menu
 } from "lucide-react";
 
 // ============================================================================
@@ -292,6 +292,9 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
       .then(res => res.json())
       .then(json => {
         setSysSettings(json);
+        if (json.appTheme) {
+          localStorage.setItem("plc_app_theme", json.appTheme);
+        }
         if (json.schoolPhone) {
           setLeaveGuardianPhone(json.schoolPhone);
         }
@@ -300,7 +303,7 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
   }, []);
 
   const themeCfg = (() => {
-    const t = sysSettings?.appTheme?.toLowerCase() || "crimson";
+    const t = sysSettings?.appTheme?.toLowerCase() || localStorage.getItem("plc_app_theme")?.toLowerCase() || "indigo";
     if (t === "indigo" || t === "blue" || t === "navy") {
       return {
         bannerBg: "bg-[#1e3a8a]",
@@ -561,7 +564,7 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
   if (loading && !data) {
     return (
       <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#f8fafc]">
-        <Loader2 className="w-10 h-10 animate-spin text-[#8f1218]" />
+        <Loader2 className={`w-10 h-10 animate-spin ${themeCfg.textColor}`} />
         <span className="text-xs font-black text-slate-500 mt-3 uppercase tracking-wider">
           កំពុងទាញយកទិន្នន័យពីប្រព័ន្ធ...
         </span>
@@ -569,38 +572,22 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
     );
   }
 
-  // Children / Students List (From Backend or Demo matching user reference)
-  const childrenList = data?.children && data.children.length > 0 ? data.children : [
-    {
-      id: "child-1",
-      studentId: "RTK0008132",
-      nameKh: "សម្បត្តិ សុខមាន",
-      photoUrl: DEFAULT_AVATARS[0],
-      course: "ភាសាខ្មែរ ថ្នាក់ទី៥",
-      level: "ក"
-    },
-    {
-      id: "child-2",
-      studentId: data?.studentId || "RTK0008132",
-      nameKh: data?.nameKh || "ស្រីមាស ពេជ្រ",
-      photoUrl: data?.photoUrl || DEFAULT_AVATARS[1],
-      course: data?.course || "អង់គ្លេសកម្រិត១",
-      level: data?.level || "ខ"
-    },
-    {
-      id: "child-3",
-      studentId: "STU003",
-      nameKh: "ប្រុសមាស ពេជ្រ",
-      photoUrl: DEFAULT_AVATARS[2],
-      course: "បឋមសិក្សា ថ្នាក់ទី៣",
-      level: "A"
-    }
-  ];
+  // Children / Students List from Actual System Database
+  const childrenList = (data?.children && data.children.length > 0)
+    ? data.children
+    : (data ? [{
+        id: data.id || "student-1",
+        studentId: data.studentId || "",
+        nameKh: data.nameKh || `${data.lastNameKh || ''} ${data.firstNameKh || ''}`.trim() || data.nameEn || "សិស្ស",
+        photoUrl: data.photoUrl || DEFAULT_AVATARS[0],
+        course: data.course || "ថ្នាក់សិក្សា",
+        level: data.level || ""
+      }] : []);
 
-  // Current active student
-  const currentStudentName = data?.nameKh || (data?.firstNameKh ? `${data.firstNameKh} ${data.lastNameKh}` : "ស្រីមាស ពេជ្រ");
-  const currentStudentId = data?.studentId || "RTK0008132";
-  const currentClassName = data?.course ? `${data.course} ${data.level || ''}`.trim() : "អង់គ្លេសកម្រិត១ ខ";
+  // Current active student profile from system
+  const currentStudentName = data?.nameKh || `${data?.lastNameKh || ''} ${data?.firstNameKh || ''}`.trim() || data?.nameEn || "សិស្សសាលារៀន";
+  const currentStudentId = data?.studentId || data?.id || "";
+  const currentClassName = data?.course ? `${data.course} ${data.level || ''}`.trim() : "ថ្នាក់សិក្សា";
 
   return (
     <div className="min-h-screen w-full bg-[#f8fafc] font-sans select-none flex flex-col items-center relative pb-16">
@@ -616,17 +603,33 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
           {viewMode === "menu" ? (
             /* MENU VIEW HEADER: Back arrow, "ម៉ឺនុយ", Student Avatar & Info */
             <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => { setViewMode("overview"); setActiveBottomTab("home"); }}
-                  className="p-1 -ml-1 rounded-full hover:bg-white/10 text-white transition-colors cursor-pointer active:scale-95"
-                >
-                  <ArrowLeft className="w-6 h-6 stroke-[2.5]" />
-                </button>
-                <h1 className="text-xl font-black text-white font-serif tracking-tight">
-                  ម៉ឺនុយ
-                </h1>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => { setViewMode("overview"); setActiveBottomTab("home"); }}
+                    className="p-1 -ml-1 rounded-full hover:bg-white/10 text-white transition-colors cursor-pointer active:scale-95"
+                  >
+                    <ArrowLeft className="w-6 h-6 stroke-[2.5]" />
+                  </button>
+                  <h1 className="text-xl font-black text-white font-serif tracking-tight">
+                    ម៉ឺនុយ (Menu)
+                  </h1>
+                </div>
+
+                {/* Right Controls: Bell Notification */}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsNotificationModalOpen(true)}
+                    className="relative p-2 rounded-full hover:bg-white/10 text-white transition-colors cursor-pointer active:scale-95"
+                  >
+                    <Bell className="w-6 h-6 stroke-[2]" />
+                    <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-red-500 text-white font-mono text-[9px] font-black flex items-center justify-center border-2 border-white">
+                      2
+                    </span>
+                  </button>
+                </div>
               </div>
 
               {/* Student Profile Info Banner inside Theme Header */}
@@ -676,7 +679,7 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
               </div>
 
               {/* Right Icons: Bell Notification & Parent Avatar */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-2.5">
                 {/* Bell Notification */}
                 <button
                   type="button"
@@ -684,7 +687,7 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
                   className="relative p-2 rounded-full hover:bg-white/10 text-white transition-colors cursor-pointer active:scale-95"
                 >
                   <Bell className="w-6 h-6 stroke-[2]" />
-                  <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-red-500 text-white font-mono text-[9px] font-black flex items-center justify-center border-2 border-[#8f1218]">
+                  <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-red-500 text-white font-mono text-[9px] font-black flex items-center justify-center border-2 border-white">
                     2
                   </span>
                 </button>
@@ -909,6 +912,20 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
                 </span>
               </motion.button>
 
+              {/* CARD 7: ថ្នាក់រៀនទាំងអស់ (All Enrolled Classes) */}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.96 }}
+                type="button"
+                onClick={() => setIsClassesModalOpen(true)}
+                className="bg-[#f4f5f7] hover:bg-[#eaeef3] p-5 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer transition-all border border-slate-200/60 shadow-2xs group min-h-[130px] col-span-2 sm:col-span-1"
+              >
+                <FolderHomeIcon fillColor={themeCfg.primaryColor} className="w-14 h-14 sm:w-16 sm:h-16 mb-2 group-hover:scale-105 transition-transform" />
+                <span className="text-xs sm:text-sm font-black text-[#1e293b] leading-tight tracking-tight">
+                  ថ្នាក់រៀនទាំងអស់
+                </span>
+              </motion.button>
+
             </div>
 
           </div>
@@ -933,12 +950,26 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
             <div className="space-y-3">
               <h3 className="text-sm sm:text-base font-black text-[#1e293b] tracking-tight font-serif flex items-center justify-between">
                 <span>ឧបករណ៍ និងសកម្មភាព (Tools & Activities)</span>
-                <span className="text-[11px] font-mono font-bold text-slate-400">៦ ឧបករណ៍</span>
+                <span className="text-[11px] font-mono font-bold text-slate-400">៧ ឧបករណ៍</span>
               </h3>
               
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 
-                {/* CARD 1: បញ្ជីវត្តមានទាំងអស់ */}
+                {/* CARD 1: ទទួលកូន (Pickup Student) */}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.96 }}
+                  type="button"
+                  onClick={() => setIsPickupModalOpen(true)}
+                  className="bg-[#f4f5f7] hover:bg-[#eaeef3] p-4 sm:p-5 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer transition-all border border-slate-200/60 shadow-2xs group min-h-[125px]"
+                >
+                  <PickupStudentIcon fillColor={themeCfg.primaryColor} className="w-12 h-12 sm:w-14 sm:h-14 mb-2 group-hover:scale-105 transition-transform" />
+                  <span className="text-xs sm:text-sm font-black text-[#1e293b] leading-tight tracking-tight">
+                    ទទួលកូន
+                  </span>
+                </motion.button>
+
+                {/* CARD 2: បញ្ជីវត្តមាន */}
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.96 }}
@@ -946,23 +977,9 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
                   onClick={() => setIsAttendanceModalOpen(true)}
                   className="bg-[#f4f5f7] hover:bg-[#eaeef3] p-4 sm:p-5 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer transition-all border border-slate-200/60 shadow-2xs group min-h-[125px]"
                 >
-                  <ClipboardCheckIcon fillColor={themeCfg.primaryColor} className="w-12 h-12 sm:w-14 sm:h-14 mb-2 group-hover:scale-105 transition-transform" />
+                  <AttendanceCalendarIcon fillColor={themeCfg.primaryColor} className="w-12 h-12 sm:w-14 sm:h-14 mb-2 group-hover:scale-105 transition-transform" />
                   <span className="text-xs sm:text-sm font-black text-[#1e293b] leading-tight tracking-tight">
-                    បញ្ជីវត្តមានទាំងអស់
-                  </span>
-                </motion.button>
-
-                {/* CARD 2: ថ្នាក់រៀនទាំងអស់ */}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.96 }}
-                  type="button"
-                  onClick={() => setIsClassesModalOpen(true)}
-                  className="bg-[#f4f5f7] hover:bg-[#eaeef3] p-4 sm:p-5 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer transition-all border border-slate-200/60 shadow-2xs group min-h-[125px]"
-                >
-                  <FolderHomeIcon fillColor={themeCfg.primaryColor} className="w-12 h-12 sm:w-14 sm:h-14 mb-2 group-hover:scale-105 transition-transform" />
-                  <span className="text-xs sm:text-sm font-black text-[#1e293b] leading-tight tracking-tight">
-                    ថ្នាក់រៀនទាំងអស់
+                    បញ្ជីវត្តមាន
                   </span>
                 </motion.button>
 
@@ -1002,7 +1019,7 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
                   onClick={() => setIsInvoiceModalOpen(true)}
                   className="bg-[#f4f5f7] hover:bg-[#eaeef3] p-4 sm:p-5 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer transition-all border border-slate-200/60 shadow-2xs group min-h-[125px]"
                 >
-                  <ReceiptTextIcon fillColor={themeCfg.primaryColor} className="w-12 h-12 sm:w-14 sm:h-14 mb-2 group-hover:scale-105 transition-transform" />
+                  <InvoiceReceiptIcon fillColor={themeCfg.primaryColor} className="w-12 h-12 sm:w-14 sm:h-14 mb-2 group-hover:scale-105 transition-transform" />
                   <span className="text-xs sm:text-sm font-black text-[#1e293b] leading-tight tracking-tight">
                     វិក្កយបត្រ
                   </span>
@@ -1016,9 +1033,23 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
                   onClick={() => setIsPaymentHistoryModalOpen(true)}
                   className="bg-[#f4f5f7] hover:bg-[#eaeef3] p-4 sm:p-5 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer transition-all border border-slate-200/60 shadow-2xs group min-h-[125px]"
                 >
-                  <DollarCircleIcon fillColor={themeCfg.primaryColor} className="w-12 h-12 sm:w-14 sm:h-14 mb-2 group-hover:scale-105 transition-transform" />
+                  <PaymentTapIcon fillColor={themeCfg.primaryColor} className="w-12 h-12 sm:w-14 sm:h-14 mb-2 group-hover:scale-105 transition-transform" />
                   <span className="text-xs sm:text-sm font-black text-[#1e293b] leading-tight tracking-tight">
                     ប្រវត្តិការបង់ប្រាក់
+                  </span>
+                </motion.button>
+
+                {/* CARD 7: ថ្នាក់រៀនទាំងអស់ */}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.96 }}
+                  type="button"
+                  onClick={() => setIsClassesModalOpen(true)}
+                  className="bg-[#f4f5f7] hover:bg-[#eaeef3] p-4 sm:p-5 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer transition-all border border-slate-200/60 shadow-2xs group min-h-[125px]"
+                >
+                  <FolderHomeIcon fillColor={themeCfg.primaryColor} className="w-12 h-12 sm:w-14 sm:h-14 mb-2 group-hover:scale-105 transition-transform" />
+                  <span className="text-xs sm:text-sm font-black text-[#1e293b] leading-tight tracking-tight">
+                    ថ្នាក់រៀនទាំងអស់
                   </span>
                 </motion.button>
 
@@ -1071,7 +1102,7 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
             <span className="text-[10px] font-black tracking-tight">សេចក្តីជូនដំណឹង</span>
           </button>
 
-          {/* TAB 4: ព័ត៌មាន (Info -> Opens Student Menu Screen directly) */}
+          {/* TAB 4: ម៉ឺនុយ (Menu -> Opens Student Menu Screen directly) */}
           <button
             type="button"
             onClick={() => { setActiveBottomTab("info"); setViewMode("menu"); }}
@@ -1079,8 +1110,8 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
               activeBottomTab === "info" ? themeCfg.textColor : "text-slate-400 hover:text-slate-600"
             }`}
           >
-            <Globe className="w-5 h-5 stroke-[2.2]" />
-            <span className="text-[10px] font-black tracking-tight">ព័ត៌មាន</span>
+            <Menu className="w-5 h-5 stroke-[2.2]" />
+            <span className="text-[10px] font-black tracking-tight">ម៉ឺនុយ (Menu)</span>
           </button>
 
         </div>
@@ -1718,7 +1749,7 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
                       }}
                       className={`w-full p-3 rounded-2xl flex items-center gap-3 transition-all cursor-pointer border text-left ${
                         isSelected 
-                          ? "bg-[#8f1218]/5 border-[#8f1218] ring-1 ring-[#8f1218]" 
+                          ? `${themeCfg.ringColor} ${themeCfg.borderColor} bg-slate-50 ring-1` 
                           : "bg-slate-50 hover:bg-slate-100 border-slate-200"
                       }`}
                     >
@@ -1732,12 +1763,12 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
                         <p className="text-xs font-mono text-slate-500">
                           ID: {child.studentId || child.id}
                         </p>
-                        <span className="text-[10px] text-[#8f1218] font-bold">
+                        <span className={`text-[10px] ${themeCfg.textColor} font-bold`}>
                           {child.course || "ថ្នាក់រៀន"} {child.level || ''}
                         </span>
                       </div>
                       {isSelected && (
-                        <div className="w-6 h-6 rounded-full bg-[#8f1218] text-white flex items-center justify-center shrink-0">
+                        <div className={`w-6 h-6 rounded-full ${themeCfg.primaryBg} text-white flex items-center justify-center shrink-0`}>
                           <Check className="w-3.5 h-3.5 stroke-[3]" />
                         </div>
                       )}
@@ -1792,7 +1823,7 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
                   value={librarySearchQuery}
                   onChange={(e) => setLibrarySearchQuery(e.target.value)}
                   placeholder="ស្វែងរកសៀវភៅ ឬអ្នកនិពន្ធ..."
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm font-medium focus:outline-none focus:border-[#8f1218] focus:bg-white transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm font-medium focus:outline-none focus:border-blue-600 focus:bg-white transition-all"
                 />
               </div>
 
@@ -1812,7 +1843,7 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
                       onClick={() => setSelectedLibraryCategory(cat.id)}
                       className={`px-3.5 py-1.5 rounded-full text-xs font-black whitespace-nowrap transition-all cursor-pointer ${
                         isActive
-                          ? "bg-[#8f1218] text-white shadow-xs"
+                          ? `${themeCfg.primaryBg} text-white shadow-xs`
                           : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                       }`}
                     >
@@ -1857,7 +1888,7 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
                         <div className="flex-1 min-w-0 flex flex-col justify-between h-28">
                           <div>
                             <div className="flex items-center justify-between gap-1 mb-1">
-                              <span className="text-[10px] font-bold text-[#8f1218] bg-rose-50 px-2 py-0.5 rounded-md border border-rose-100">
+                              <span className={`text-[10px] font-bold ${themeCfg.textColor} bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100`}>
                                 {book.categoryKh}
                               </span>
                               <div className="flex items-center gap-1 text-amber-500 text-[11px] font-bold">
@@ -1907,7 +1938,7 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
                                   setReadingBook(book);
                                   setReaderPage(1);
                                 }}
-                                className="px-3 py-1 bg-[#8f1218] hover:bg-[#a3161d] text-white rounded-xl text-[10px] font-black shadow-xs transition-all cursor-pointer flex items-center gap-1 active:scale-95"
+                                className={`px-3 py-1 ${themeCfg.primaryBg} hover:opacity-90 text-white rounded-xl text-[10px] font-black shadow-xs transition-all cursor-pointer flex items-center gap-1 active:scale-95`}
                               >
                                 <BookOpen className="w-3 h-3" />
                                 <span>អាន</span>
@@ -1937,7 +1968,7 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
               className="w-full max-w-xl bg-[#faf8f5] rounded-3xl shadow-2xl relative border border-amber-200/60 flex flex-col h-[88vh] overflow-hidden"
             >
               {/* Reader Header */}
-              <div className="bg-[#8f1218] text-white p-3.5 px-4 flex items-center justify-between shrink-0 shadow-md">
+              <div className={`${themeCfg.bannerBg} text-white p-3.5 px-4 flex items-center justify-between shrink-0 shadow-md`}>
                 <div className="flex items-center gap-2.5 min-w-0">
                   <button
                     type="button"
@@ -1973,7 +2004,7 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
               {/* Chapter Content Canvas */}
               <div className="flex-1 overflow-y-auto p-5 sm:p-7 space-y-4 font-serif text-slate-800 leading-relaxed text-sm sm:text-base">
                 <div className="border-b border-amber-200/80 pb-3 mb-4">
-                  <span className="text-[10px] font-black uppercase text-[#8f1218] tracking-widest block mb-1">
+                  <span className={`text-[10px] font-black uppercase ${themeCfg.textColor} tracking-widest block mb-1`}>
                     {readingBook.categoryKh} • {readingBook.author}
                   </span>
                   <h2 className="text-base sm:text-lg font-black text-slate-900 leading-tight">
@@ -2008,7 +2039,7 @@ export default function StudentPortal({ studentId }: { studentId: string }) {
                   type="button"
                   disabled={readerPage >= readingBook.chapters.length}
                   onClick={() => setReaderPage(readerPage + 1)}
-                  className="px-4 py-2 bg-[#8f1218] hover:bg-[#a3161d] disabled:opacity-40 disabled:hover:bg-[#8f1218] text-white rounded-2xl text-xs font-black shadow-xs flex items-center gap-1 cursor-pointer transition-all active:scale-95"
+                  className={`px-4 py-2 ${themeCfg.primaryBg} hover:opacity-90 disabled:opacity-40 text-white rounded-2xl text-xs font-black shadow-xs flex items-center gap-1 cursor-pointer transition-all active:scale-95`}
                 >
                   <span>ទំព័របន្ទាប់</span>
                   <ChevronRight className="w-3.5 h-3.5" />

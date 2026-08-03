@@ -1,11 +1,75 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Briefcase, Users, UserPlus, BookOpen, Award, Clock, List, LayoutGrid, Trash2, Eye, Search, Filter, Plus, Edit3, GraduationCap, Download, Camera, ChevronLeft, ChevronRight, X, Phone, Save, Pencil, Calendar, DollarSign, CreditCard, MapPin, Smartphone, ChevronDown, Check, User, Activity, ArrowUp, ArrowDown, LineChart, TrendingUp, Printer, Heart, RotateCcw, Landmark, MessageSquare, Folder, File, Terminal, Server, Workflow, Network, Layers, FileCode, BarChart2, FileText, Globe, ImageIcon, Info, AlertTriangle, Coins, Sparkles, Cpu, CheckCircle, Database, Loader2, RefreshCw } from 'lucide-react';
+import {
+  Database,
+  Loader2,
+  RefreshCw,
+  Cpu,
+  Info,
+  Save,
+  Download,
+  Eye,
+  Check,
+  Terminal,
+  FileCode,
+  ChevronDown,
+  User,
+  GraduationCap,
+  Users,
+  Calendar,
+  Clock,
+  CreditCard,
+  Coins,
+  LayoutGrid,
+  Award,
+  Layers,
+  CheckCircle,
+  Sparkles,
+  Server,
+  ShieldCheck,
+  HardDrive,
+  Copy,
+  Zap,
+  Lock,
+  ExternalLink,
+  Code2
+} from 'lucide-react';
 
 export default function MySQLDBTab(props: any) {
-  const { activeTab, dbCounts, generatedSql, generatingSql, handleGenerateAndDownloadSql, handleGenerateSql, handleLiveMigrate, handleTestMysqlConnection, migrating, migrationLogs, mysqlDbName, mysqlHost, mysqlPassword, mysqlPort, mysqlUser, setMysqlDbName, setMysqlHost, setMysqlPassword, setMysqlPort, setMysqlUser, setShowPrismaInMysql, showPrismaInMysql, showToast, students, teachers, testingConnection, toKhmerNumeral, token, uiLang } = props;
+  const {
+    activeTab,
+    dbCounts,
+    generatedSql,
+    generatingSql,
+    handleGenerateAndDownloadSql,
+    handleGenerateSql,
+    handleLiveMigrate,
+    handleTestMysqlConnection,
+    migrating,
+    migrationLogs,
+    mysqlDbName,
+    mysqlHost,
+    mysqlPassword,
+    mysqlPort,
+    mysqlUser,
+    setMysqlDbName,
+    setMysqlHost,
+    setMysqlPassword,
+    setMysqlPort,
+    setMysqlUser,
+    setShowPrismaInMysql,
+    showPrismaInMysql,
+    showToast,
+    students,
+    teachers,
+    testingConnection,
+    toKhmerNumeral,
+    token,
+    uiLang
+  } = props;
 
   const [localLang, setLocalLang] = React.useState(uiLang || localStorage.getItem("plc_lang") || "kh");
+  const [copiedCode, setCopiedCode] = React.useState(false);
 
   React.useEffect(() => {
     if (uiLang) {
@@ -29,110 +93,189 @@ export default function MySQLDBTab(props: any) {
 
   return (
     <>
-{activeTab === "MySQL DB" && (
-              <motion.div
-                key="mysql-db-tab"
-                initial={{ opacity: 0.92 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.1, ease: "easeOut" }}
-                className="w-full space-y-6"
-              >
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                  <div className="bg-blue-600 p-6 text-white">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      <div className="space-y-1">
-                        <h3 className="font-extrabold text-lg flex items-center gap-2">
-                          <Database className="w-5 h-5" />
-                          {idt("ការតភ្ជាប់ទិន្នន័យ MySQL", "MySQL DB Synchronization Hub (MySQL DB Synchronization Hub)", "MySQL 数据库同步中心 (MySQL DB Synchronization Hub)")}
-                        </h3>
-                        <p className="text-xs text-blue-100 font-semibold leading-relaxed">
-                          {idt("ធ្វើសមកាលកម្មទិន្នន័យរវាងប្រព័ន្ធគ្រប់គ្រងសាលានេះ ទៅកាន់មូលដ្ឋានទិន្នន័យ MySQL ខាងក្រៅដោយផ្ទាល់។", "Directly synchronize database between this school system (SQLite) and an external MySQL database.", "直接在此学校系统 (SQLite) 与外部 MySQL 数据库之间进行数据同步。")}
-                        </p>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={handleTestMysqlConnection}
-                          disabled={testingConnection}
-                          className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5"
-                        >
-                          {testingConnection ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
-                          <span>{idt("តេស្តការតភ្ជាប់", "Test Sync (Test Sync)", "测试同步 (Test Sync)")}</span>
-                        </button>
+      {activeTab === "MySQL DB" && (
+        <motion.div
+          key="mysql-db-tab"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          className="w-full space-y-6"
+        >
+          {/* MAIN CONTAINER */}
+          <div className="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
+            
+            {/* HERO HEADER */}
+            <div className="bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-900 p-6 md:p-7 text-white relative overflow-hidden">
+              {/* Background Glow Accents */}
+              <div className="absolute -right-10 -bottom-10 w-60 h-60 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+              <div className="absolute left-1/3 -top-10 w-40 h-40 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
-                        <button
-                          onClick={handleLiveMigrate}
-                          disabled={migrating}
-                          className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
-                        >
-                          {migrating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Cpu className="w-3.5 h-3.5" />}
-                          <span>{idt("ធ្វើសមកាលកម្មផ្ទាល់", "Live Sync (Live Sync)", "实时同步 (Live Sync)")}</span>
-                        </button>
+              <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
+                <div className="space-y-1.5 max-w-2xl">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-200 text-[11px] font-extrabold">
+                    <Database className="w-3.5 h-3.5 text-indigo-300" />
+                    <span>{idt("ប្រព័ន្ធសមកាលកម្មទិន្នន័យ", "Database Sync Engine", "数据库同步引擎")}</span>
+                  </div>
+                  <h3 className="font-black text-xl md:text-2xl text-white tracking-tight font-serif flex items-center gap-2.5">
+                    <span>{idt("ការតភ្ជាប់ទិន្នន័យ MySQL", "MySQL Database Synchronization Hub", "MySQL 数据库同步中心")}</span>
+                  </h3>
+                  <p className="text-xs md:text-sm text-slate-300 font-medium leading-relaxed">
+                    {idt(
+                      "ធ្វើសមកាលកម្មទិន្នន័យរវាងប្រព័ន្ធគ្រប់គ្រងសាលានេះ (SQLite) ទៅកាន់មូលដ្ឋានទិន្នន័យ MySQL ខាងក្រៅ ឬទាញយកឯកសារ SQL Dump សម្រាប់ Import ដោយផ្ទាល់។",
+                      "Synchronize data between this school management system and external MySQL databases or export structured SQL dumps.",
+                      "在此学校管理系统与外部 MySQL 数据库之间同步数据或导出结构化 SQL 转储。"
+                    )}
+                  </p>
+                </div>
+
+                {/* ACTION BUTTONS */}
+                <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleTestMysqlConnection}
+                    disabled={testingConnection}
+                    className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 backdrop-blur-md active:scale-95 disabled:opacity-50"
+                  >
+                    {testingConnection ? <Loader2 className="w-4 h-4 animate-spin text-indigo-200" /> : <RefreshCw className="w-4 h-4 text-indigo-200" />}
+                    <span>{idt("តេស្តការតភ្ជាប់", "Test Connection", "测试连接")}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleLiveMigrate}
+                    disabled={migrating}
+                    className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white rounded-2xl text-xs font-black transition-all cursor-pointer flex items-center gap-2 shadow-md shadow-emerald-950/30 active:scale-95 disabled:opacity-50"
+                  >
+                    {migrating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                    <span>{idt("ធ្វើសមកាលកម្មផ្ទាល់", "Live Sync", "实时同步")}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* BODY SECTION */}
+            <div className="p-5 md:p-7 space-y-6 bg-slate-50/60">
+
+              {/* CLOUD CONTAINER NOTICE BANNER */}
+              <div className="bg-amber-50/90 border border-amber-200/90 rounded-2xl p-4 md:p-5 flex items-start gap-3.5 shadow-2xs">
+                <div className="w-9 h-9 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-black shrink-0 shadow-xs">
+                  <Info className="w-5 h-5 stroke-[2.2]" />
+                </div>
+                <div className="space-y-1 text-xs">
+                  <div className="font-extrabold text-amber-950 text-sm flex items-center gap-2">
+                    <span>{idt("💡 ព័ត៌មានណែនាំអំពីការតភ្ជាប់ MySQL លើ Cloud Container", "💡 Important Notice on MySQL Connection in Cloud Environment", "💡 关于云环境中 MySQL 连接的重要提示")}</span>
+                  </div>
+                  <p className="text-amber-900 leading-relaxed font-medium">
+                    {idt(
+                      "ដោយសារកម្មវិធីនេះកំពុងដំណើរការលើ Cloud Container ប្រសិនបើអ្នកប្រើ Host `localhost` ឬ `127.0.0.1` ការតេស្ត ឬ Sync នឹងបង្ហាញកំហុស `ECONNREFUSED 127.0.0.1:3306` ព្រោះគ្មាន MySQL Server ក្នុង Container ឡើយ។ ប្រសិនបើអ្នកចង់ផ្ទេរទិន្នន័យទៅ MySQL របស់អ្នក សូមប្រើប៊ូតុង 📥 'ទាញយកឯកសារ SQL' ខាងស្តាំ ដើម្បីទាញយកឯកសារ SQL ទៅ Import ចូល phpMyAdmin/MySQL Client ដោយផ្ទាល់។",
+                      "Since this app runs in a Cloud Container, testing or syncing to `localhost` or `127.0.0.1` will result in `ECONNREFUSED 127.0.0.1:3306`. If you wish to migrate your data to your MySQL database, please click 📥 'Download SQL File' on the right to import into phpMyAdmin/MySQL Client directly.",
+                      "由于此应用运行在云容器中，测试或同步到 `localhost` 或 `127.0.0.1` 会导致 `ECONNREFUSED`。如果您要迁移数据，请点击右侧的 📥 '下载 SQL 文件' 以直接导入 phpMyAdmin/MySQL。"
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              {/* TWO COLUMN GRID */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                
+                {/* LEFT COLUMN: CREDENTIALS FORM */}
+                <div className="lg:col-span-5 bg-white border border-slate-200/90 rounded-3xl p-6 md:p-7 space-y-6 shadow-sm flex flex-col justify-between relative overflow-hidden">
+                  <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-600 via-blue-600 to-teal-500"></div>
+
+                  <div className="space-y-5">
+                    <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-100 text-indigo-700 flex items-center justify-center font-bold shadow-2xs">
+                          <Lock className="w-5 h-5 text-indigo-600 stroke-[2.2]" />
+                        </div>
+                        <div>
+                          <h4 className="font-extrabold text-slate-900 text-xs md:text-sm">
+                            {idt("ព័ត៌មានតភ្ជាប់ MySQL Credentials", "MySQL Connection Credentials", "MySQL 连接凭据")}
+                          </h4>
+                          <p className="text-[11px] text-slate-400 font-medium">
+                            {idt("កំណត់ព័ត៌មាន Host, Port និង Database ខាងក្រៅ", "Configure external Host, Port & Database", "配置外部主机、端口和数据库")}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="p-6 grid grid-cols-1 md:grid-cols-12 gap-6 bg-slate-50/50">
-                    {/* Database Credentials Form */}
-                    <div className="md:col-span-6 bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-3xs">
-                      <h4 className="font-extrabold text-slate-800 text-xs uppercase tracking-wider pb-2 border-b border-slate-200">
-                        {idt("ទិន្នន័យតភ្ជាប់ MySQL Credentials", "MySQL Connection Credentials", "MySQL 连接凭据")}
-                      </h4>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="space-y-1.5">
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">MySQL Host</label>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                        <div className="sm:col-span-8 space-y-1.5">
+                          <label className="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                            <Server className="w-3.5 h-3.5 text-indigo-500" />
+                            <span>MySQL Host</span>
+                          </label>
                           <input
                             type="text"
                             value={mysqlHost}
                             onChange={(e) => setMysqlHost(e.target.value)}
-                            className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 font-mono bg-slate-50/50 focus:bg-white focus:border-primary-500 focus:ring-2 focus:ring-primary-100 focus:outline-none transition-all"
+                            placeholder="localhost"
+                            className="w-full px-3.5 py-2.5 border border-slate-200/90 rounded-2xl text-xs font-bold text-slate-800 font-mono bg-slate-50/80 focus:bg-white focus:border-indigo-600 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none transition-all shadow-2xs"
                           />
                         </div>
 
-                        <div className="space-y-1.5">
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Port</label>
+                        <div className="sm:col-span-4 space-y-1.5">
+                          <label className="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                            <HardDrive className="w-3.5 h-3.5 text-indigo-500" />
+                            <span>Port</span>
+                          </label>
                           <input
                             type="text"
                             value={mysqlPort}
                             onChange={(e) => setMysqlPort(e.target.value)}
-                            className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 font-mono bg-slate-50/50 focus:bg-white focus:border-primary-500 focus:ring-2 focus:ring-primary-100 focus:outline-none transition-all"
+                            placeholder="3306"
+                            className="w-full px-3.5 py-2.5 border border-slate-200/90 rounded-2xl text-xs font-bold text-slate-800 font-mono bg-slate-50/80 focus:bg-white focus:border-indigo-600 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none transition-all shadow-2xs"
                           />
                         </div>
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Database Name</label>
+                        <label className="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                          <Database className="w-3.5 h-3.5 text-indigo-500" />
+                          <span>Database Name</span>
+                        </label>
                         <input
                           type="text"
                           value={mysqlDbName}
                           onChange={(e) => setMysqlDbName(e.target.value)}
-                          className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 font-mono bg-slate-50/50 focus:bg-white focus:border-primary-500 focus:ring-2 focus:ring-primary-100 focus:outline-none transition-all"
+                          placeholder="plc_school_db"
+                          className="w-full px-3.5 py-2.5 border border-slate-200/90 rounded-2xl text-xs font-bold text-slate-800 font-mono bg-slate-50/80 focus:bg-white focus:border-indigo-600 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none transition-all shadow-2xs"
                         />
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div className="space-y-1.5">
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Username</label>
+                          <label className="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                            <User className="w-3.5 h-3.5 text-indigo-500" />
+                            <span>Username</span>
+                          </label>
                           <input
                             type="text"
                             value={mysqlUser}
                             onChange={(e) => setMysqlUser(e.target.value)}
-                            className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 font-mono bg-slate-50/50 focus:bg-white focus:border-primary-500 focus:ring-2 focus:ring-primary-100 focus:outline-none transition-all"
+                            placeholder="root"
+                            className="w-full px-3.5 py-2.5 border border-slate-200/90 rounded-2xl text-xs font-bold text-slate-800 font-mono bg-slate-50/80 focus:bg-white focus:border-indigo-600 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none transition-all shadow-2xs"
                           />
                         </div>
 
                         <div className="space-y-1.5">
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Password</label>
+                          <label className="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                            <Lock className="w-3.5 h-3.5 text-indigo-500" />
+                            <span>Password</span>
+                          </label>
                           <input
                             type="password"
                             value={mysqlPassword}
                             onChange={(e) => setMysqlPassword(e.target.value)}
-                            className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 font-mono bg-slate-50/50 focus:bg-white focus:border-primary-500 focus:ring-2 focus:ring-primary-100 focus:outline-none transition-all"
+                            placeholder="••••••••"
+                            className="w-full px-3.5 py-2.5 border border-slate-200/90 rounded-2xl text-xs font-bold text-slate-800 font-mono bg-slate-50/80 focus:bg-white focus:border-indigo-600 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none transition-all shadow-2xs"
                           />
                         </div>
                       </div>
+                    </div>
 
+                    <div className="pt-3">
                       <button
                         type="button"
                         onClick={async () => {
@@ -152,7 +295,7 @@ export default function MySQLDBTab(props: any) {
                               })
                             });
                             if (res.ok) {
-                              showToast(idt("រក្សាទុកព័ត៌មានតភ្ជាប់បានជោគជ័យ! (MySQL Credentials saved!)", "MySQL Connection Credentials saved successfully!", "成功保存 MySQL 连接凭据！"), "success");
+                              showToast(idt("រក្សាទុកព័ត៌មានតភ្ជាប់បានជោគជ័យ!", "MySQL Connection Credentials saved successfully!", "成功保存 MySQL 连接凭据！"), "success");
                             } else {
                               showToast(idt("រក្សាទុកព័ត៌មានតភ្ជាប់បរាជ័យ!", "Failed to save connection credentials!", "保存连接凭据失败！"), "error");
                             }
@@ -161,276 +304,361 @@ export default function MySQLDBTab(props: any) {
                             showToast(idt("កំហុស៖ ", "Error: ", "错误：") + err.message, "error");
                           }
                         }}
-                        className="w-full py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold tracking-wide flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] cursor-pointer mt-1"
+                        className="w-full py-3.5 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 hover:from-slate-800 hover:to-indigo-900 text-white rounded-2xl text-xs font-black tracking-wide flex items-center justify-center gap-2.5 transition-all active:scale-[0.98] cursor-pointer shadow-md hover:shadow-lg border border-slate-800/80 group"
                       >
-                        <Save className="w-3.5 h-3.5" />
-                        {idt("រក្សាទុកព័ត៌មានតភ្ជាប់", "Save Credentials (Save Credentials)", "保存凭据 (Save Credentials)")}
+                        <Save className="w-4 h-4 text-amber-400 group-hover:rotate-12 transition-transform duration-200" />
+                        <span>{idt("រក្សាទុកព័ត៌មានតភ្ជាប់", "Save Connection Credentials", "保存连接凭据")}</span>
                       </button>
                     </div>
+                  </div>
+                </div>
 
-                    {/* SQL Generator & Statistics Box */}
-                    <div className="md:col-span-6 bg-white border border-slate-200/80 rounded-2xl p-6 space-y-6 shadow-xs flex flex-col justify-between">
-                      
-                      {/* Section Title & Description */}
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-primary-700">
-                          <Database className="w-4 h-4" />
-                          <h4 className="font-extrabold text-[#2563eb] text-xs uppercase tracking-wider">
-                            SQL GENERATION & DOWNLOAD
+                {/* RIGHT COLUMN: SQL EXPORT & STATS GRID */}
+                  <div className="lg:col-span-7 bg-white border border-slate-200/90 rounded-3xl p-6 md:p-7 space-y-6 shadow-sm flex flex-col justify-between relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-teal-500 via-blue-600 to-indigo-600"></div>
+
+                    {/* HEADER TITLE */}
+                    <div className="space-y-1.5 pb-4 border-b border-slate-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-teal-50 border border-teal-100 text-teal-700 flex items-center justify-center font-bold shadow-2xs">
+                          <Code2 className="w-5 h-5 text-teal-600 stroke-[2.2]" />
+                        </div>
+                        <div>
+                          <h4 className="font-black text-slate-900 text-xs md:text-sm flex items-center gap-2">
+                            <span>{idt("បង្កើត & ទាញយកកូដ SQL", "SQL Generation & Download", "SQL 生成与下载")}</span>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-teal-100 text-teal-800 border border-teal-200/60 font-mono">
+                              MySQL Dump
+                            </span>
                           </h4>
+                          <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                            {idt(
+                              "ទាញយកទិន្នន័យទាំងអស់ជាឯកសារ SQL ដើម្បីងាយស្រួលយកទៅ Import ចូលក្នុង phpMyAdmin ឬ MySQL client ខាងក្រៅដោយផ្ទាល់។",
+                              "Download all database contents as a structured SQL dump file for easy importing into phpMyAdmin or external MySQL clients.",
+                              "将所有数据库内容下载为结构化 SQL 转储文件，以便轻松导入 phpMyAdmin 或外部 MySQL 客户端。"
+                            )}
+                          </p>
                         </div>
-                        <p className="text-[11px] text-slate-500 leading-relaxed font-semibold">
-                          {idt("ទាញយកទិន្នន័យទាំងអស់ជាឯកសារ SQL ដើម្បីងាយស្រួលយកទៅ Import ចូលក្នុង phpMyAdmin ឬ MySQL client ខាងក្រៅដោយផ្ទាល់ និងមានសុវត្ថិភាពខ្ពស់។", "Download all database contents as an SQL dump file for easy and secure importing into phpMyAdmin or external MySQL clients.", "将所有数据库内容下载为 SQL 转储文件，以便轻松、安全地导入到 phpMyAdmin 或外部 MySQL 客户端中。")}
-                        </p>
+                      </div>
+                    </div>
+
+                    {/* STATS GRID */}
+                    <div className="bg-slate-50/90 p-4 md:p-5 rounded-2xl border border-slate-200/80 space-y-3.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-black text-slate-600 flex items-center gap-1.5">
+                          <Database className="w-3.5 h-3.5 text-indigo-500" />
+                          <span>{idt("ស្ថិតិទិន្នន័យ SQLite បច្ចុប្បន្នដែលត្រូវទាញយក៖", "Current Database Records Breakdown:", "当前要下载的数据库记录明细：")}</span>
+                        </span>
+                        <span className="text-[10px] font-black bg-indigo-600 text-white px-2.5 py-0.5 rounded-full shadow-2xs font-mono">
+                          10 Tables
+                        </span>
                       </div>
 
-                      {/* Database Stats Badge Container */}
-                      <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-2.5">
-                        <span className="text-[9.5px] font-black text-slate-400 uppercase tracking-wider block">
-                          {idt("ស្ថិតិទិន្នន័យ SQLite បច្ចុប្បន្នដែលត្រូវទាញយក៖", "Current SQLite database stats to download:", "当前要下载的 SQLite 数据库统计信息：")}
-                        </span>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                          {[
-                            {
-                              key: "User",
-                              label: idt("គណនីបុគ្គលិក", "Staff Accounts (User)", "员工账户 (User)"),
-                              count: dbCounts.User,
-                              unit: idt("នាក់", "users", "人"),
-                              icon: User,
-                              color: "text-blue-500 bg-blue-50 border-blue-100",
-                            },
-                            {
-                              key: "Student",
-                              label: idt("ទិន្នន័យសិស្ស", "Student Records (Student)", "学生记录 (Student)"),
-                              count: (dbCounts && dbCounts.Student) || (students || []).length,
-                              unit: idt("នាក់", "students", "人"),
-                              icon: GraduationCap,
-                              color: "text-primary-500 bg-primary-50 border-primary-100",
-                            },
-                            {
-                              key: "Teacher",
-                              label: idt("ទិន្នន័យគ្រូ", "Teacher Records (Teacher)", "教师记录 (Teacher)"),
-                              count: (dbCounts && dbCounts.Teacher) || (teachers || []).length,
-                              unit: idt("នាក់", "teachers", "人"),
-                              icon: Users,
-                              color: "text-emerald-500 bg-emerald-50 border-emerald-100",
-                            },
-                            {
-                              key: "Attendance",
-                              label: idt("វត្តមានសិស្ស", "Student Attendance (Attendance)", "学生考勤 (Attendance)"),
-                              count: dbCounts.Attendance,
-                              unit: idt("ដង", "records", "次"),
-                              icon: Calendar,
-                              color: "text-amber-500 bg-amber-50 border-amber-100",
-                            },
-                            {
-                              key: "TeacherAttendance",
-                              label: idt("វត្តមានគ្រូ", "Teacher Attendance (Teacher Attendance)", "教师考勤 (Teacher Attendance)"),
-                              count: dbCounts.TeacherAttendance,
-                              unit: idt("ដង", "records", "次"),
-                              icon: Clock,
-                              color: "text-rose-500 bg-rose-50 border-rose-100",
-                            },
-                            {
-                              key: "Invoice",
-                              label: idt("វិក្កយបត្រ", "Invoices & Payments (Invoice)", "发票与付款 (Invoice)"),
-                              count: dbCounts.Invoice,
-                              unit: idt("ច្បាប់", "invoices", "张"),
-                              icon: CreditCard,
-                              color: "text-blue-500 bg-blue-50 border-blue-100",
-                            },
-                            {
-                              key: "SalaryPayment",
-                              label: idt("ប្រាក់បៀវត្សរ៍គ្រូ", "Teacher Salaries (Salary)", "教师工资 (Salary)"),
-                              count: dbCounts.SalaryPayment,
-                              unit: idt("ដង", "payments", "次"),
-                              icon: Coins,
-                              color: "text-teal-500 bg-teal-50 border-teal-100",
-                            },
-                            {
-                              key: "CertificateTemplate",
-                              label: idt("គំរូវិញ្ញាបនបត្រ", "Certificate Templates (Template)", "证书模板 (Template)"),
-                              count: dbCounts.CertificateTemplate,
-                              unit: idt("ផ្ទាំង", "templates", "套"),
-                              icon: LayoutGrid,
-                              color: "text-cyan-500 bg-cyan-50 border-cyan-100",
-                            },
-                            {
-                              key: "Certificate",
-                              label: idt("វិញ្ញាបនបត្រដែលចេញ", "Issued Certificates (Cert)", "已发证书 (Cert)"),
-                              count: dbCounts.Certificate,
-                              unit: idt("សន្លឹក", "certificates", "张"),
-                              icon: Award,
-                              color: "text-orange-500 bg-orange-50 border-orange-100",
-                            },
-                            {
-                              key: "Asset",
-                              label: idt("គ្រប់គ្រងសម្ភារៈសិក្សា", "Assets & Materials (Asset)", "学校物资设备 (Asset)"),
-                              count: JSON.parse(localStorage.getItem("plc_school_assets") || "[]").length,
-                              unit: idt("មុខ", "items", "种"),
-                              icon: Layers,
-                              color: "text-amber-600 bg-amber-50 border-amber-200",
-                            },
-                          ].map((table) => {
-                            const IconComponent = table.icon;
-                            return (
-                              <div key={table.key} className="bg-white p-2.5 rounded-xl border border-slate-200/50 flex items-center gap-2.5 shadow-3xs hover:shadow-2xs transition-all hover:border-slate-300">
-                                <div className={`p-2 rounded-lg border ${table.color.split(' ').slice(1).join(' ')} shrink-0`}>
-                                  <IconComponent className={`w-3.5 h-3.5 ${table.color.split(' ')[0]}`} />
-                                </div>
-                                <div className="min-w-0">
-                                  <span className="block text-[7.5px] font-black text-slate-400 uppercase truncate">
-                                    {table.label}
-                                  </span>
-                                  <span className="text-xs font-black text-slate-700 font-mono">
-                                    {toKhmerNumeral(table.count)} {table.unit}
-                                  </span>
-                                </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
+                        {[
+                          {
+                            key: "User",
+                            label: idt("គណនីបុគ្គលិក", "Staff Users", "员工账户"),
+                            count: dbCounts.User,
+                            unit: idt("នាក់", "users", "人"),
+                            icon: User,
+                            color: "text-blue-600 bg-blue-50 border-blue-200/80",
+                          },
+                          {
+                            key: "Student",
+                            label: idt("ទិន្នន័យសិស្ស", "Students", "学生记录"),
+                            count: (dbCounts && dbCounts.Student) || (students || []).length,
+                            unit: idt("នាក់", "students", "人"),
+                            icon: GraduationCap,
+                            color: "text-indigo-600 bg-indigo-50 border-indigo-200/80",
+                          },
+                          {
+                            key: "Teacher",
+                            label: idt("ទិន្នន័យគ្រូ", "Teachers", "教师记录"),
+                            count: (dbCounts && dbCounts.Teacher) || (teachers || []).length,
+                            unit: idt("នាក់", "teachers", "人"),
+                            icon: Users,
+                            color: "text-emerald-600 bg-emerald-50 border-emerald-200/80",
+                          },
+                          {
+                            key: "Attendance",
+                            label: idt("វត្តមានសិស្ស", "Student Attendance", "学生考勤"),
+                            count: dbCounts.Attendance,
+                            unit: idt("ដង", "records", "次"),
+                            icon: Calendar,
+                            color: "text-amber-600 bg-amber-50 border-amber-200/80",
+                          },
+                          {
+                            key: "TeacherAttendance",
+                            label: idt("វត្តមានគ្រូ", "Teacher Attendance", "教师考勤"),
+                            count: dbCounts.TeacherAttendance,
+                            unit: idt("ដង", "records", "次"),
+                            icon: Clock,
+                            color: "text-rose-600 bg-rose-50 border-rose-200/80",
+                          },
+                          {
+                            key: "Invoice",
+                            label: idt("វិក្កយបត្រ", "Invoices", "发票"),
+                            count: dbCounts.Invoice,
+                            unit: idt("ច្បាប់", "invoices", "张"),
+                            icon: CreditCard,
+                            color: "text-purple-600 bg-purple-50 border-purple-200/80",
+                          },
+                          {
+                            key: "SalaryPayment",
+                            label: idt("ប្រាក់បៀវត្សរ៍គ្រូ", "Teacher Salaries", "教师工资"),
+                            count: dbCounts.SalaryPayment,
+                            unit: idt("ដង", "payments", "次"),
+                            icon: Coins,
+                            color: "text-teal-600 bg-teal-50 border-teal-200/80",
+                          },
+                          {
+                            key: "CertificateTemplate",
+                            label: idt("គំរូវិញ្ញាបនបត្រ", "Templates", "证书模板"),
+                            count: dbCounts.CertificateTemplate,
+                            unit: idt("ផ្ទាំង", "templates", "套"),
+                            icon: LayoutGrid,
+                            color: "text-cyan-600 bg-cyan-50 border-cyan-200/80",
+                          },
+                          {
+                            key: "Certificate",
+                            label: idt("វិញ្ញាបនបត្រចេញ", "Issued Certs", "已发证书"),
+                            count: dbCounts.Certificate,
+                            unit: idt("សន្លឹក", "certificates", "张"),
+                            icon: Award,
+                            color: "text-orange-600 bg-orange-50 border-orange-200/80",
+                          },
+                          {
+                            key: "Asset",
+                            label: idt("សម្ភារៈសិក្សា", "School Assets", "学校物资"),
+                            count: JSON.parse(localStorage.getItem("plc_school_assets") || "[]").length,
+                            unit: idt("មុខ", "items", "种"),
+                            icon: Layers,
+                            color: "text-amber-700 bg-amber-50 border-amber-200/80",
+                          },
+                        ].map((table) => {
+                          const IconComponent = table.icon;
+                          return (
+                            <div
+                              key={table.key}
+                              className="bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200/90 flex items-center gap-2.5 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 hover:border-indigo-400 group cursor-default"
+                            >
+                              <div className={`p-2 rounded-xl border ${table.color} shrink-0 group-hover:scale-105 transition-transform`}>
+                                <IconComponent className="w-4 h-4 stroke-[2.2]" />
                               </div>
-                            );
-                          })}
-                        </div>
-                        <div className="text-[8.5px] text-slate-500 font-bold flex items-center gap-1.5 mt-1 bg-primary-50/50 p-1.5 rounded-md text-primary-700 border border-primary-100/30">
-                          <CheckCircle className="w-3.5 h-3.5 shrink-0 text-primary-500" />
-                          <span>{idt("ប្រព័ន្ធនឹងទាញយកតារាងទិន្នន័យទាំង ១០ របស់សាលាទាំងមូលដោយស្វ័យប្រវត្ត។", "The system will automatically download all 10 database tables for the entire school.", "系统将自动下载整个学校的所有 10 个数据库表。")}</span>
-                        </div>
-                      </div>
-
-                      {/* SQL Code Preview Container */}
-                      <div className="space-y-3">
-                        <span className="text-[9.5px] font-black text-slate-400 uppercase tracking-wider block">
-                          {idt("កូដ SQL Preview៖", "SQL Code Preview:", "SQL 代码预览：")}
-                        </span>
-                        <div className="bg-slate-900 rounded-xl p-4 relative min-h-[120px] flex flex-col justify-between border border-slate-800">
-                          {generatedSql ? (
-                            <div className="w-full flex flex-col justify-between h-full space-y-2">
-                              <pre className="text-[9.5px] font-mono text-primary-300 w-full overflow-x-auto max-h-[160px] whitespace-pre overflow-y-auto scrollbar-none select-all leading-normal">
-                                {generatedSql}
-                              </pre>
-                              <div className="text-[8.5px] font-bold text-slate-400 bg-slate-800/60 p-1 rounded max-w-fit px-2 border border-slate-700/50">
-                                Size: {toKhmerNumeral(Math.ceil(generatedSql.length / 1024).toString())} KB ({toKhmerNumeral(generatedSql.split('\n').length.toString())} Lines)
+                              <div className="min-w-0 flex-1">
+                                <span
+                                  className="block text-[10px] sm:text-[11px] font-bold text-slate-500 leading-tight truncate"
+                                  title={table.label}
+                                >
+                                  {table.label}
+                                </span>
+                                <span className="text-xs sm:text-sm font-black text-slate-900 font-mono block mt-0.5">
+                                  {toKhmerNumeral(table.count)} <span className="text-[10px] font-semibold text-slate-500 font-sans">{table.unit}</span>
+                                </span>
                               </div>
                             </div>
-                          ) : (
-                            <div className="flex flex-col items-center justify-center py-6 text-center space-y-1 w-full h-full">
-                              <span className="text-[10px] font-mono text-slate-500 font-bold">{idt("កូដ SQL មិនទាន់ត្រូវបានបង្កើតនៅឡើយទេ...", "SQL code has not been generated yet...", "SQL 代码尚未生成...")}</span>
-                              <span className="text-[8.5px] text-slate-600 font-semibold font-sans">{idt("សូមចុចប៊ូតុងខាងក្រោមដើម្បីទាញយក ឬមើលគំរូកូដ", "Please click the button below to download or preview the code.", "请点击下方按钮下载或预览代码。")}</span>
-                            </div>
-                          )}
-
-                          {generatedSql && (
-                            <div className="absolute top-3 right-3 flex items-center gap-1.5">
-                              <button
-                                onClick={() => {
-                                  navigator.clipboard.writeText(generatedSql);
-                                  showToast(idt("បានចម្លងកូដ SQL រួចរាល់! (SQL copied!)", "SQL code copied to clipboard successfully!", "已成功复制 SQL 代码！"), "success");
-                                }}
-                                className="px-2.5 py-1 bg-white/10 hover:bg-white/20 hover:text-emerald-400 text-white rounded-md text-[9.5px] font-bold transition-all backdrop-blur-md flex items-center gap-1 border border-white/5 cursor-pointer shadow-sm"
-                              >
-                                <Check className="w-3 h-3" />
-                                {idt("ចម្លង", "Copy (Copy)", "复制 (Copy)")}
-                              </button>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Control Buttons */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          <button
-                            type="button"
-                            onClick={handleGenerateAndDownloadSql}
-                            disabled={generatingSql}
-                            className="py-2.5 bg-[#2563eb] hover:bg-[#2b1fbb] text-white rounded-xl text-xs font-bold tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer shadow-md shadow-primary-100 disabled:opacity-60"
-                          >
-                            {generatingSql ? (
-                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                            ) : (
-                              <Download className="w-3.5 h-3.5" />
-                            )}
-                            {idt("ទាញយកឯកសារ SQL", "Download SQL File (Download .SQL)", "下载 SQL 文件 (Download .SQL)")}
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={handleGenerateSql}
-                            disabled={generatingSql}
-                            className="py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-extrabold tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer border border-slate-200/60 disabled:opacity-60"
-                          >
-                            {generatingSql ? (
-                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                            ) : generatedSql ? (
-                              <RefreshCw className="w-3.5 h-3.5" />
-                            ) : (
-                              <Eye className="w-3.5 h-3.5" />
-                            )}
-                            {generatedSql ? idt("បង្កើតកូដឡើងវិញ", "Re-Generate", "重新生成") : idt("មើលគំរូកូដ SQL", "Preview SQL Code", "预览 SQL 代码")}
-                          </button>
-                        </div>
+                          );
+                        })}
                       </div>
 
-                      {/* Live Sync Log Terminal Section (Single and elegant) */}
-                      <div className="bg-slate-950 text-slate-300 rounded-xl p-5 border border-slate-900 space-y-3 font-mono shadow-inner">
-                        <div className="flex items-center justify-between border-b border-slate-900 pb-2">
-                          <div className="flex items-center gap-1.5">
-                            <Terminal className="w-3.5 h-3.5 text-primary-400" />
-                            <span className="text-[9.5px] font-black text-slate-400 uppercase tracking-wider">
-                              {idt("របាយការណ៍ដំណើរការ", "Migration Output Terminal (Migration Output Terminal)", "数据迁移输出终端 (Migration Output Terminal)")}
+                      <div className="text-[11px] text-slate-600 font-bold flex items-center gap-2 pt-2 border-t border-slate-200/70 mt-1">
+                        <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0 stroke-[2.2]" />
+                        <span>{idt("ប្រព័ន្ធនឹងទាញយកតារាងទិន្នន័យទាំង ១០ របស់សាលាទាំងមូលដោយស្វ័យប្រវត្ត។", "The system will automatically download all 10 database tables for the school.", "系统将自动下载学校的所有 10 个数据库表。")}</span>
+                      </div>
+                    </div>
+
+                  {/* SQL PREVIEW CODE TERMINAL */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">
+                        {idt("កូដ SQL PREVIEW TERMINAL:", "SQL Code Preview Terminal:", "SQL 代码预览终端：")}
+                      </span>
+                      {generatedSql && (
+                        <span className="text-[10px] font-mono font-bold text-indigo-600 bg-indigo-50 border border-indigo-200/60 px-2 py-0.5 rounded-md">
+                          {toKhmerNumeral(Math.ceil(generatedSql.length / 1024).toString())} KB ({toKhmerNumeral(generatedSql.split('\n').length.toString())} {idt("បន្ទាត់", "lines", "行")})
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-md">
+                      {/* Terminal Bar */}
+                      <div className="px-4 py-2.5 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2.5 h-2.5 rounded-full bg-rose-500/80"></div>
+                          <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80"></div>
+                          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></div>
+                          <span className="text-[10px] font-mono font-bold text-slate-400 ml-2">plc_school_db.sql</span>
+                        </div>
+                        {generatedSql && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText(generatedSql);
+                              setCopiedCode(true);
+                              setTimeout(() => setCopiedCode(false), 2000);
+                              showToast(idt("បានចម្លងកូដ SQL រួចរាល់!", "SQL code copied to clipboard successfully!", "已成功复制 SQL 代码！"), "success");
+                            }}
+                            className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1.5 border border-slate-700 cursor-pointer active:scale-95"
+                          >
+                            {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-300" />}
+                            <span>{copiedCode ? idt("បានចម្លង", "Copied", "已复制") : idt("ចម្លងកូដ", "Copy SQL", "复制 SQL")}</span>
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Code Area */}
+                      <div className="p-4 min-h-[140px] max-h-[180px] overflow-y-auto scrollbar-none font-mono text-xs">
+                        {generatedSql ? (
+                          <pre className="text-[10px] font-mono text-emerald-400 leading-relaxed whitespace-pre select-all">
+                            {generatedSql}
+                          </pre>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center py-8 text-center space-y-1.5 text-slate-500">
+                            <Code2 className="w-8 h-8 text-slate-700 stroke-[1.5]" />
+                            <span className="text-xs font-mono font-bold text-slate-400">
+                              {idt("កូដ SQL មិនទាន់ត្រូវបានបង្កើតនៅឡើយទេ...", "SQL code has not been generated yet...", "SQL 代码尚未生成...")}
+                            </span>
+                            <span className="text-[10px] text-slate-500 font-sans">
+                              {idt("សូមចុចប៊ូតុងខាងក្រោមដើម្បីមើលគំរូ ឬទាញយកឯកសារ SQL", "Click the button below to preview or download the SQL file.", "点击下方按钮预览或下载 SQL 文件。")}
                             </span>
                           </div>
-                          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        </div>
-                        <div className="h-28 overflow-y-auto text-[9.5px] space-y-1.5 leading-relaxed scrollbar-none font-mono">
-                          {migrationLogs.length > 0 ? (
-                            migrationLogs.map((logLine, i) => (
-                              <p key={i} className={logLine.includes("ជោគជ័យ") || logLine.includes("🎉") ? "text-emerald-400" : logLine.includes("បរាជ័យ") ? "text-rose-400" : "text-slate-300"}>
-                                {logLine}
-                              </p>
-                            ))
-                          ) : (
-                            <p className="text-slate-600 italic">{idt("មិនទាន់មានដំណើរការផ្ទេរទិន្នន័យនៅឡើយទេ...", "No migration process has been initiated yet... (Terminal idle)", "尚未启动任何迁移进程... (Terminal idle)")}</p>
-                          )}
-                        </div>
+                        )}
                       </div>
+                    </div>
+
+                    {/* ACTION BUTTONS */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
+                      <button
+                        type="button"
+                        onClick={handleGenerateAndDownloadSql}
+                        disabled={generatingSql}
+                        className="py-3.5 bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700 hover:from-indigo-500 hover:to-blue-600 text-white rounded-2xl text-xs font-black tracking-wide flex items-center justify-center gap-2.5 transition-all active:scale-[0.98] cursor-pointer shadow-lg shadow-indigo-600/20 hover:shadow-xl hover:shadow-indigo-600/30 disabled:opacity-60 border border-indigo-500/30 group"
+                      >
+                        {generatingSql ? (
+                          <Loader2 className="w-4 h-4 animate-spin text-indigo-200" />
+                        ) : (
+                          <Download className="w-4 h-4 text-amber-300 group-hover:-translate-y-0.5 transition-transform" />
+                        )}
+                        <span>{idt("ទាញយកឯកសារ SQL (.sql)", "Download SQL File (.sql)", "下载 SQL 文件 (.sql)")}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleGenerateSql}
+                        disabled={generatingSql}
+                        className="py-3.5 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl text-xs font-black tracking-wide flex items-center justify-center gap-2.5 transition-all active:scale-[0.98] cursor-pointer border border-slate-800 shadow-md disabled:opacity-60 group"
+                      >
+                        {generatingSql ? (
+                          <Loader2 className="w-4 h-4 animate-spin text-indigo-300" />
+                        ) : generatedSql ? (
+                          <RefreshCw className="w-4 h-4 text-indigo-400 group-hover:rotate-180 transition-transform duration-500" />
+                        ) : (
+                          <Eye className="w-4 h-4 text-slate-300 group-hover:scale-110 transition-transform" />
+                        )}
+                        <span>{generatedSql ? idt("បង្កើតកូដឡើងវិញ", "Re-Generate SQL", "重新生成 SQL") : idt("មើលគំរូកូដ SQL", "Preview SQL Code", "预览 SQL 代码")}</span>
+                      </button>
                     </div>
                   </div>
 
-                  {/* PRISMA MYSQL SCHEMA CODE ACCORDION */}
-                  <div className="p-6 border-t border-slate-100 bg-slate-50/35">
-                    <div className="bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-2xs">
-                      <button
-                        type="button"
-                        onClick={() => setShowPrismaInMysql(!showPrismaInMysql)}
-                        className="w-full px-5 py-4 flex items-center justify-between bg-white hover:bg-slate-50 transition-colors text-left cursor-pointer outline-none"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center">
-                            <FileCode className="w-4 h-4 text-primary-600" />
-                          </div>
-                          <div>
-                            <span className="font-extrabold text-xs uppercase text-slate-800 tracking-wider block">
-                              {idt("រចនាសម្ព័ន្ធតារាងទិន្នន័យ PRISMA & MYSQL SCHEMA CODE", "PRISMA & MYSQL DATABASE SCHEMA CODE", "PRISMA & MYSQL 数据库结构代码")}
-                            </span>
-                            <span className="text-[10px] text-slate-400 font-semibold block mt-0.5">
-                              {idt("មើលព័ត៌មានលម្អិតនៃ Schema និងទំនាក់ទំនងរវាង Tables ទាំង ៩", "View complete schema details and relationships of all 9 tables", "查看所有 9 个数据表的完整结构和关系")}
-                            </span>
-                          </div>
+                  {/* LIVE TERMINAL LOGS */}
+                  <div className="bg-slate-950 text-slate-300 rounded-2xl p-4 border border-slate-800/90 space-y-3 font-mono shadow-xl relative overflow-hidden">
+                    <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+                      <div className="flex items-center gap-2.5">
+                        <div className="p-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+                          <Terminal className="w-4 h-4" />
                         </div>
-                        <div className="flex items-center gap-1.5 text-slate-400 font-extrabold text-xs">
-                          <span>{showPrismaInMysql ? idt("លាក់", "Hide", "隐藏") : idt("បង្ហាញ", "Show", "显示")}</span>
-                          <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showPrismaInMysql ? "rotate-180" : ""}`} />
-                        </div>
-                      </button>
+                        <span className="text-[11px] font-black text-slate-200 uppercase tracking-wider">
+                          {idt("របាយការណ៍ដំណើរការ (Migration Terminal Log)", "Migration Terminal Log", "迁移终端日志")}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 bg-slate-900/90 px-2.5 py-1 rounded-full border border-slate-800">
+                        <span className="text-[9px] font-mono font-bold text-slate-400">STATUS: READY</span>
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      </div>
+                    </div>
+                    <div className="h-28 overflow-y-auto text-[10px] space-y-1.5 leading-relaxed scrollbar-thin scrollbar-thumb-slate-800 font-mono pr-1">
+                      {migrationLogs.length > 0 ? (
+                        migrationLogs.map((logLine, i) => (
+                          <p
+                            key={i}
+                            className={
+                              logLine.includes("ជោគជ័យ") || logLine.includes("🎉")
+                                ? "text-emerald-400 font-semibold flex items-start gap-1"
+                                : logLine.includes("បរាជ័យ") || logLine.includes("ECONNREFUSED")
+                                ? "text-rose-400 font-semibold flex items-start gap-1"
+                                : "text-slate-300 flex items-start gap-1"
+                            }
+                          >
+                            <span className="text-indigo-400 shrink-0">&gt;</span>
+                            <span>{logLine}</span>
+                          </p>
+                        ))
+                      ) : (
+                        <p className="text-slate-500 italic flex items-center gap-2 py-2">
+                          <span className="text-indigo-500/60 font-bold">&gt;</span>
+                          <span>{idt("មិនទាន់មានដំណើរការផ្ទេរទិន្នន័យនៅឡើយទេ... (Terminal idle)", "No migration process initiated... (Terminal idle)", "尚未启动任何迁移进程... (Terminal idle)")}</span>
+                        </p>
+                      )}
+                    </div>
+                  </div>
 
-                      {showPrismaInMysql && (
-                        <div className="border-t border-slate-100">
-                          {/* Prisma code view */}
-                          <div className="p-5 bg-slate-950 font-mono text-xs text-slate-300 overflow-x-auto max-h-[500px] overflow-y-auto scrollbar-none">
-                            <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-800 text-slate-500">
-                              <span>prisma/schema.prisma</span>
-                              <span className="text-[10px] bg-primary-500/10 text-primary-400 border border-primary-500/20 px-2 py-0.5 rounded uppercase font-sans font-black">Prisma Core</span>
-                            </div>
-                            <pre className="leading-relaxed whitespace-pre font-mono">
-{`generator client {
+                </div>
+              </div>
+
+              {/* ACCORDION: PRISMA & MYSQL SCHEMA CODE */}
+              <div className="border border-slate-200/90 bg-white rounded-3xl overflow-hidden shadow-2xs w-full">
+                <button
+                  type="button"
+                  onClick={() => setShowPrismaInMysql(!showPrismaInMysql)}
+                  className="w-full px-4 sm:px-6 py-4 flex items-center justify-between bg-white hover:bg-slate-50/80 transition-all text-left cursor-pointer outline-none gap-3"
+                >
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0 shadow-2xs">
+                      <FileCode className="w-5 h-5 text-indigo-600 stroke-[2.2]" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="font-extrabold text-xs sm:text-sm text-slate-900 leading-snug break-normal whitespace-normal">
+                        {idt("កូដ រចនាសម្ព័ន្ធ ទិន្នន័យ Prisma & MySQL Schema", "Prisma & MySQL Database Schema Code", "Prisma & MySQL 数据库结构代码")}
+                      </h4>
+                      <p className="text-[11px] sm:text-xs text-slate-500 font-medium leading-snug mt-0.5 break-normal whitespace-normal">
+                        {idt("មើល ព័ត៌មានលម្អិត នៃ Schema និង ទំនាក់ទំនង រវាង Tables ទាំងអស់", "View complete schema details and relationships of all database tables", "查看所有数据库表的完整结构和关系")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-indigo-600 font-extrabold text-xs bg-indigo-50 px-3 py-1.5 rounded-xl border border-indigo-100 shrink-0 whitespace-nowrap">
+                    <span>{showPrismaInMysql ? idt("លាក់", "Hide", "隐藏") : idt("បង្ហាញ", "Show Schema", "显示 Schema")}</span>
+                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showPrismaInMysql ? "rotate-180" : ""}`} />
+                  </div>
+                </button>
+
+                {showPrismaInMysql && (
+                  <div className="border-t border-slate-200/80 bg-slate-950">
+                    <div className="p-4 sm:p-5 font-mono text-xs text-slate-300">
+                      <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-800 text-slate-400 gap-2">
+                        <span className="text-xs font-mono font-bold text-slate-300 truncate">prisma/schema.prisma</span>
+                        <span className="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2.5 py-1 rounded-lg font-sans font-extrabold shrink-0">
+                          Prisma Core Schema
+                        </span>
+                      </div>
+                      <div className="overflow-x-auto max-h-[480px] overflow-y-auto rounded-xl bg-slate-900/60 p-3.5 border border-slate-800/80">
+                        <pre className="leading-relaxed whitespace-pre font-mono text-slate-200 text-[11px] sm:text-xs">
+                          {PRISMA_SCHEMA_CODE}
+                        </pre>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </>
+  );
+}
+
+const PRISMA_SCHEMA_CODE = `generator client {
   provider = "prisma-client-js"
 }
 
@@ -620,15 +848,5 @@ enum PaymentStatus {
   PENDING
   PAID
   OVERDUE
-}`}
-                            </pre>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}    </>
-  );
 }
+`;
