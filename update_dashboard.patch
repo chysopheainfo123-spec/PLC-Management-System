@@ -1,0 +1,57 @@
+--- src/components/tabs/DashboardTab.tsx
++++ src/components/tabs/DashboardTab.tsx
+@@ -8,6 +8,54 @@
+ } from 'lucide-react';
+ 
+ export default function DashboardTab(props: any) {
+-  const { activeTab } = props;
++  const { 
++    activeTab, 
++    students = [], 
++    teachers = [],
++    user,
++    currentTime = new Date(),
++    t = (str: string) => str,
++    uiLang = 'en',
++    toKhmerNumeral = (num: number) => num.toString()
++  } = props;
+ 
+   if (activeTab !== "Dashboard") return null;
++  
++  // Basic calculations based on real data
++  const totalStudents = students.length;
++  const totalTeachers = teachers.length;
++  
++  const activeStudents = students.filter(s => s.status === 'STUDYING').length;
++  
++  const totalPaid = students.reduce((sum, s) => sum + (Number(s.paid) || 0), 0);
++  const totalDue = students.reduce((sum, s) => sum + (Number(s.due) || 0), 0);
++  const totalRevenue = totalPaid + totalDue; // Expected revenue
++  
++  // Display formatters
++  const displayTotalStudents = uiLang === 'kh' ? toKhmerNumeral(totalStudents) : totalStudents.toLocaleString();
++  const displayActiveStudents = uiLang === 'kh' ? toKhmerNumeral(activeStudents) : activeStudents.toLocaleString();
++  const displayTotalTeachers = uiLang === 'kh' ? toKhmerNumeral(totalTeachers) : totalTeachers.toLocaleString();
++  const displayTotalPaid = uiLang === 'kh' ? toKhmerNumeral(totalPaid) : totalPaid.toLocaleString();
++  const displayTotalDue = uiLang === 'kh' ? toKhmerNumeral(totalDue) : totalDue.toLocaleString();
++  const displayTotalRevenue = uiLang === 'kh' ? toKhmerNumeral(totalRevenue) : totalRevenue.toLocaleString();
++  
++  // Active percentage
++  const activePercentage = totalStudents > 0 ? Math.round((activeStudents / totalStudents) * 100) : 0;
++  const paidPercentage = totalRevenue > 0 ? Math.round((totalPaid / totalRevenue) * 100) : 0;
++  
++  // Get a few recent students for "Live Activity"
++  const recentStudents = [...students].sort((a, b) => {
++    // If we don't have a specific createdAt, we can use startDate or id to simulate recent
++    if (a.startDate && b.startDate) {
++      return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
++    }
++    return 0;
++  }).slice(0, 4);
++
++  // Get pending actions: students with due balance > 0
++  const studentsWithDue = students.filter(s => (Number(s.due) || 0) > 0);
++  const dueCount = studentsWithDue.length;
++  const displayDueCount = uiLang === 'kh' ? toKhmerNumeral(dueCount) : dueCount.toLocaleString();
+ 
+   return (

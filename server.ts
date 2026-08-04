@@ -75,13 +75,6 @@ function verifyToken(req: express.Request, res: express.Response): any {
   try {
     return jwt.verify(token, JWT_SECRET);
   } catch (err) {
-    // If the token is validly formatted e.g. from previous server session before restart
-    try {
-      const decodedUnverified = jwt.decode(token);
-      if (decodedUnverified && typeof decodedUnverified === "object" && (decodedUnverified as any).id) {
-        return decodedUnverified;
-      }
-    } catch (decodeErr) {}
     res.status(401).json({ message: "ថូខឹនមិនត្រឹមត្រូវ ឬហួសសម័យ!" });
     return null;
   }
@@ -158,348 +151,7 @@ function scanDir(dirPath: string, relativePath = ""): any[] {
 process.on('uncaughtException', (err) => {
   // Silent or log to file in production to avoid clutter
 });
-process.on('unhandledRejection', (reason, promise) => {
-  // Silent or log to file
-});
-
-async function seed15ModelStudents() {
-  const count = await prisma.student.count();
-  if (count > 0) return; // Already seeded
-
-  console.log("Seeding 15 Model/Outstanding Students...");
-
-  const modelStudents = [
-    { studentId: "PLC-001", nameKh: "សុខ សុភក្ត្រា", nameEn: "SOK SOPHEAKTRA", firstNameKh: "សុភក្ត្រា", lastNameKh: "សុខ", firstNameEn: "SOPHEAKTRA", lastNameEn: "SOK", gender: "Male", course: "Web Development (HTML/CSS)", level: "Level 3", status: "STUDYING", shift: "វេនយប់", fee: 120, paid: 120, due: 0, guardianName: "សុខ ម៉ៅ", guardianPhone: "012345678", phoneNumber: "0961234567", dob: "2005-04-12", pob: "ភ្នំពេញ" },
-    { studentId: "PLC-002", nameKh: "ចាន់ ធីតា", nameEn: "CHAN THIDA", firstNameKh: "ធីតា", lastNameKh: "ចាន់", firstNameEn: "THIDA", lastNameEn: "CHAN", gender: "Female", course: "Adobe Photoshop", level: "Level 1", status: "STUDYING", shift: "វេនរសៀល", fee: 100, paid: 100, due: 0, guardianName: "ចាន់ សំរឹទ្ធ", guardianPhone: "012876543", phoneNumber: "0881234567", dob: "2006-08-21", pob: "កណ្តាល" },
-    { studentId: "PLC-003", nameKh: "កែវ វិចិត្រ", nameEn: "KEO VICHET", firstNameKh: "វិចិត្រ", lastNameKh: "កែវ", firstNameEn: "VICHET", lastNameEn: "KEO", gender: "Male", course: "Microsoft Word & Excel", level: "Level 2", status: "STUDYING", shift: "វេនព្រឹក", fee: 80, paid: 80, due: 0, guardianName: "កែវ ជា", guardianPhone: "097123456", phoneNumber: "097321654", dob: "2004-11-30", pob: "តាកែវ" },
-    { studentId: "PLC-004", nameKh: "លី សុវណ្ណី", nameEn: "LY SOVANNY", firstNameKh: "សុវណ្ណី", lastNameKh: "លី", firstNameEn: "SOVANNY", lastNameEn: "LY", gender: "Female", course: "Digital Marketing", level: "Level 1", status: "STUDYING", shift: "វេនយប់", fee: 150, paid: 150, due: 0, guardianName: "លី ហួរ", guardianPhone: "015234567", phoneNumber: "015987654", dob: "2005-01-15", pob: "ភ្នំពេញ" },
-    { studentId: "PLC-005", nameKh: "នូ សេងហ័រ", nameEn: "NOU SENGHOR", firstNameKh: "សេងហ័រ", lastNameKh: "នូ", firstNameEn: "SENGHOR", lastNameEn: "NOU", gender: "Male", course: "PC Hardware & Repair", level: "Level 2", status: "STUDYING", shift: "វេនរសៀល", fee: 110, paid: 110, due: 0, guardianName: "នូ វ៉ាន់", guardianPhone: "011345678", phoneNumber: "011765432", dob: "2003-09-05", pob: "កំពង់ចាម" },
-    { studentId: "PLC-006", nameKh: "សេង ជាតា", nameEn: "SENG CHEATA", firstNameKh: "ជាតា", lastNameKh: "សេង", firstNameEn: "CHEATA", lastNameEn: "SENG", gender: "Female", course: "Web Development (HTML/CSS)", level: "Level 3", status: "STUDYING", shift: "វេនយប់", fee: 120, paid: 120, due: 0, guardianName: "សេង ហុង", guardianPhone: "016456789", phoneNumber: "016987654", dob: "2006-03-18", pob: "កំពង់ធំ" },
-    { studentId: "PLC-007", nameKh: "ឈឹម ស្រីនិច", nameEn: "CHHIM SREYNICH", firstNameKh: "ស្រីនិច", lastNameKh: "ឈឹម", firstNameEn: "SREYNICH", lastNameEn: "CHHIM", gender: "Female", course: "Adobe Photoshop", level: "Level 2", status: "STUDYING", shift: "វេនព្រឹក", fee: 100, paid: 100, due: 0, guardianName: "ឈឹម ណារី", guardianPhone: "099123456", phoneNumber: "099876543", dob: "2005-07-22", pob: "សៀមរាប" },
-    { studentId: "PLC-008", nameKh: "ពេញ សុវណ្ណ", nameEn: "PENH SOVAN", firstNameKh: "សុវណ្ណ", lastNameKh: "ពេញ", firstNameEn: "SOVAN", lastNameEn: "PENH", gender: "Male", course: "Microsoft Word & Excel", level: "Level 1", status: "STUDYING", shift: "វេនរសៀល", fee: 80, paid: 80, due: 0, guardianName: "ពេញ សុខា", guardianPhone: "017234567", phoneNumber: "017987654", dob: "2004-12-10", pob: "បាត់ដំបង" },
-    { studentId: "PLC-009", nameKh: "រស់ វ៉ាន់ឌី", nameEn: "ROS VANDY", firstNameKh: "វ៉ាន់ឌី", lastNameKh: "រស់", firstNameEn: "VANDY", lastNameEn: "ROS", gender: "Male", course: "PC Hardware & Repair", level: "Level 2", status: "STUDYING", shift: "វេនយប់", fee: 110, paid: 110, due: 0, guardianName: "រស់ ម៉ារី", guardianPhone: "093456789", phoneNumber: "093876543", dob: "2003-05-14", pob: "ពោធិ៍សាត់" },
-    { studentId: "PLC-010", nameKh: "លីម កាំង", nameEn: "LIM KANG", firstNameKh: "កាំង", lastNameKh: "លីម", firstNameEn: "KANG", lastNameEn: "LIM", gender: "Male", course: "Digital Marketing", level: "Level 2", status: "STUDYING", shift: "វេនព្រឹក", fee: 150, paid: 150, due: 0, guardianName: "លីម ឆាយ", guardianPhone: "012345612", phoneNumber: "012345634", dob: "2005-10-05", pob: "ភ្នំពេញ" },
-    { studentId: "PLC-011", nameKh: "មាស សាលី", nameEn: "MEAS SALY", firstNameKh: "សាលី", lastNameKh: "មាស", firstNameEn: "SALY", lastNameEn: "MEAS", gender: "Female", course: "Adobe Photoshop", level: "Level 1", status: "STUDYING", shift: "វេនយប់", fee: 100, paid: 100, due: 0, guardianName: "មាស ដារ៉ា", guardianPhone: "015456123", phoneNumber: "015654321", dob: "2006-02-28", pob: "ព្រៃវែង" },
-    { studentId: "PLC-012", nameKh: "ហួត សុភា", nameEn: "HUOT SOPHEA", firstNameKh: "សុភា", lastNameKh: "ហួត", firstNameEn: "SOPHEA", lastNameEn: "HUOT", gender: "Female", course: "Microsoft Word & Excel", level: "Level 2", status: "STUDYING", shift: "វេនរសៀល", fee: 80, paid: 80, due: 0, guardianName: "ហួត វណ្ណី", guardianPhone: "098123987", phoneNumber: "098321987", dob: "2004-06-15", pob: "ស្វាយរៀង" },
-    { studentId: "PLC-013", nameKh: "ជា សំណាង", nameEn: "CHEA SAMNANG", firstNameKh: "សំណាង", lastNameKh: "ជា", firstNameEn: "SAMNANG", lastNameEn: "CHEA", gender: "Male", course: "Web Development (HTML/CSS)", level: "Level 3", status: "STUDYING", shift: "វេនយប់", fee: 120, paid: 120, due: 0, guardianName: "ជា ពិសិដ្ឋ", guardianPhone: "096456123", phoneNumber: "096321456", dob: "2005-09-09", pob: "កណ្តាល" },
-    { studentId: "PLC-014", nameKh: "តែក គីមហុង", nameEn: "TEK KIMHONG", firstNameKh: "គីមហុង", lastNameKh: "តែក", firstNameEn: "KIMHONG", lastNameEn: "TEK", gender: "Male", course: "Digital Marketing", level: "Level 1", status: "STUDYING", shift: "វេនរសៀល", fee: 150, paid: 150, due: 0, guardianName: "តែក សុង", guardianPhone: "088456789", phoneNumber: "088987654", dob: "2006-11-12", pob: "ភ្នំពេញ" },
-    { studentId: "PLC-015", nameKh: "អ៊ុង រិទ្ធី", nameEn: "OUNG RITHY", firstNameKh: "រិទ្ធី", lastNameKh: "អ៊ុង", firstNameEn: "RITHY", lastNameEn: "OUNG", gender: "Male", course: "PC Hardware & Repair", level: "Level 2", status: "STUDYING", shift: "វេនព្រឹក", fee: 110, paid: 110, due: 0, guardianName: "អ៊ុង ដារ៉ា", guardianPhone: "011987123", phoneNumber: "011321987", dob: "2003-01-25", pob: "កំពង់ស្ពឺ" }
-  ];
-
-  for (const s of modelStudents) {
-    const created = await prisma.student.create({
-      data: {
-        studentId: s.studentId,
-        nameKh: s.nameKh,
-        nameEn: s.nameEn,
-        firstNameKh: s.firstNameKh,
-        lastNameKh: s.lastNameKh,
-        firstNameEn: s.firstNameEn,
-        lastNameEn: s.lastNameEn,
-        gender: s.gender,
-        course: s.course,
-        level: s.level,
-        status: s.status,
-        shift: s.shift,
-        fee: s.fee,
-        paid: s.paid,
-        due: s.due,
-        fullFee: s.fee,
-        discount: 0,
-        guardianName: s.guardianName,
-        guardianPhone: s.guardianPhone,
-        phoneNumber: s.phoneNumber,
-        dob: s.dob,
-        pob: s.pob,
-        startDate: "2026-05-01",
-        endDate: "2026-11-01"
-      }
-    });
-
-    const months = ["2026-05", "2026-06", "2026-07"];
-    for (const m of months) {
-      const scoreVal = Math.floor(Math.random() * 12) + 88; // high outstanding scores: 88 to 99
-      await prisma.score.create({
-        data: {
-          studentId: created.id,
-          month: m,
-          subject: s.course,
-          score: scoreVal,
-          rank: null
-        }
-      });
-    }
-  }
-
-  // Recalculate ranks
-  const allScores = await prisma.score.findMany();
-  const groups: { [key: string]: typeof allScores } = {};
-  for (const s of allScores) {
-    const key = `${s.month}_${s.subject}`;
-    if (!groups[key]) groups[key] = [];
-    groups[key].push(s);
-  }
-
-  for (const key in groups) {
-    const groupScores = groups[key];
-    groupScores.sort((a, b) => b.score - a.score);
-    let currentRank = 1;
-    let currentScore = -1;
-    for (let i = 0; i < groupScores.length; i++) {
-      const s = groupScores[i];
-      if (s.score !== currentScore) {
-        currentRank = i + 1;
-        currentScore = s.score;
-      }
-      await prisma.score.update({
-        where: { id: s.id },
-        data: { rank: currentRank }
-      });
-    }
-  }
-
-  console.log("Seeding of 15 model students with outstanding academic records completed!");
-}
-
-async function seed5ModelTeachers() {
-  const count = await prisma.teacher.count();
-  if (count > 0) return; // Already seeded
-
-  console.log("Seeding 5 Model/Outstanding Teachers...");
-
-  const modelTeachers = [
-    {
-      teacherId: "PLC-T01",
-      nameKh: "លី វឌ្ឍនា",
-      nameEn: "LY VATTANA",
-      firstNameKh: "វឌ្ឍនា",
-      lastNameKh: "លី",
-      firstNameEn: "VATTANA",
-      lastNameEn: "LY",
-      gender: "Male",
-      specialty: "Advanced Web Development & Node.js",
-      phone: "012888999",
-      dob: "1994-05-12",
-      pob: "ភ្នំពេញ",
-      joinDate: "2024-01-10",
-      experienceDays: "5 Years",
-      salary: 650,
-      paymentStatus: "PAID",
-      status: "ACTIVE",
-      notes: "Outstanding senior full-stack developer and lecturer.",
-      email: "vattana.ly@plc.edu.kh",
-      phoneNumber: "012888999"
-    },
-    {
-      teacherId: "PLC-T02",
-      nameKh: "ស៊ិន ម៉ារីណា",
-      nameEn: "SIN MARINA",
-      firstNameKh: "ម៉ារីណា",
-      lastNameKh: "ស៊ិន",
-      firstNameEn: "MARINA",
-      lastNameEn: "SIN",
-      gender: "Female",
-      specialty: "UX/UI Design & Adobe Photoshop Specialist",
-      phone: "016777888",
-      dob: "1996-08-15",
-      pob: "កណ្តាល",
-      joinDate: "2024-02-15",
-      experienceDays: "4 Years",
-      salary: 550,
-      paymentStatus: "PAID",
-      status: "ACTIVE",
-      notes: "Creative director and design bootcamp trainer.",
-      email: "marina.sin@plc.edu.kh",
-      phoneNumber: "016777888"
-    },
-    {
-      teacherId: "PLC-T03",
-      nameKh: "អ៊ុំ សារ៉ាវុធ",
-      nameEn: "OUM SARAVUTH",
-      firstNameKh: "សារ៉ាវុធ",
-      lastNameKh: "អ៊ុំ",
-      firstNameEn: "SARAVUTH",
-      lastNameEn: "OUM",
-      gender: "Male",
-      specialty: "Microsoft Office Specialist (MOS) Expert",
-      phone: "097555666",
-      dob: "1991-11-20",
-      pob: "តាកែវ",
-      joinDate: "2023-09-01",
-      experienceDays: "6 Years",
-      salary: 450,
-      paymentStatus: "PAID",
-      status: "ACTIVE",
-      notes: "Expert corporate Excel and Office automation master.",
-      email: "saravuth.oum@plc.edu.kh",
-      phoneNumber: "097555666"
-    },
-    {
-      teacherId: "PLC-T04",
-      nameKh: "កែវ រចនា",
-      nameEn: "KEO RACHANA",
-      firstNameKh: "រចនា",
-      lastNameKh: "កែវ",
-      firstNameEn: "RACHANA",
-      lastNameEn: "KEO",
-      gender: "Female",
-      specialty: "PC Hardware, Network Engineering & Repair Specialist",
-      phone: "093444555",
-      dob: "1995-04-22",
-      pob: "សៀមរាប",
-      joinDate: "2024-05-20",
-      experienceDays: "3 Years",
-      salary: 600,
-      paymentStatus: "PAID",
-      status: "ACTIVE",
-      notes: "Cisco certified network engineer and lab administrator.",
-      email: "rachana.keo@plc.edu.kh",
-      phoneNumber: "093444555"
-    },
-    {
-      teacherId: "PLC-T05",
-      nameKh: "សុខ ម៉េងលី",
-      nameEn: "SOK MENGLY",
-      firstNameKh: "ម៉េងលី",
-      lastNameKh: "សុខ",
-      firstNameEn: "MENGLY",
-      lastNameEn: "SOK",
-      gender: "Male",
-      specialty: "Digital Marketing, SEO & Social Media Strategist",
-      phone: "011222333",
-      dob: "1997-09-05",
-      pob: "កំពង់ចាម",
-      joinDate: "2024-06-01",
-      experienceDays: "3 Years",
-      salary: 500,
-      paymentStatus: "PAID",
-      status: "ACTIVE",
-      notes: "Google certified advertising consultant and trainer.",
-      email: "mengly.sok@plc.edu.kh",
-      phoneNumber: "011222333"
-    }
-  ];
-
-  for (const t of modelTeachers) {
-    await prisma.teacher.create({
-      data: {
-        teacherId: t.teacherId,
-        nameKh: t.nameKh,
-        nameEn: t.nameEn,
-        firstNameKh: t.firstNameKh,
-        lastNameKh: t.lastNameKh,
-        firstNameEn: t.firstNameEn,
-        lastNameEn: t.lastNameEn,
-        gender: t.gender,
-        specialty: t.specialty,
-        phone: t.phone,
-        dob: t.dob,
-        pob: t.pob,
-        joinDate: t.joinDate,
-        experienceDays: t.experienceDays,
-        salary: t.salary,
-        paymentStatus: t.paymentStatus,
-        status: t.status,
-        notes: t.notes,
-        email: t.email,
-        phoneNumber: t.phoneNumber
-      }
-    });
-  }
-
-  console.log("Seeding of 5 model teachers with outstanding records completed!");
-}
-
-async function seed5ModelCourses() {
-  const count = await prisma.course.count();
-  if (count > 0) return; // Already seeded
-
-  console.log("Seeding 5 Model Courses and linking students...");
-
-  // Let's find teachers so we can associate them with courses
-  const teachers = await prisma.teacher.findMany();
-  const getTeacherIdBySpecialtyKeyword = (keyword: string) => {
-    const t = teachers.find(teach => 
-      (teach.specialty || "").toLowerCase().includes(keyword.toLowerCase()) || 
-      (teach.nameEn || "").toLowerCase().includes(keyword.toLowerCase())
-    );
-    return t ? t.id : null;
-  };
-
-  const modelCourses = [
-    {
-      title: "Web Development (HTML/CSS)",
-      price: 120,
-      duration: "6 ខែ (6 Months)",
-      hours: "វេនយប់ 6:00PM - 7:30PM",
-      teacherKeyword: "Web"
-    },
-    {
-      title: "Adobe Photoshop",
-      price: 100,
-      duration: "3 ខែ (3 Months)",
-      hours: "វេនរសៀល 2:00PM - 4:00PM",
-      teacherKeyword: "Photoshop"
-    },
-    {
-      title: "Microsoft Word & Excel",
-      price: 80,
-      duration: "3 ខែ (3 Months)",
-      hours: "វេនព្រឹក 8:00AM - 10:00AM",
-      teacherKeyword: "Office"
-    },
-    {
-      title: "Digital Marketing",
-      price: 150,
-      duration: "4 ខែ (4 Months)",
-      hours: "វេនយប់ 6:30PM - 8:30PM",
-      teacherKeyword: "Marketing"
-    },
-    {
-      title: "PC Hardware & Repair",
-      price: 110,
-      duration: "5 ខែ (5 Months)",
-      hours: "វេនរសៀល 1:00PM - 3:00PM",
-      teacherKeyword: "Hardware"
-    }
-  ];
-
-  const createdCourses: Record<string, any> = {};
-
-  for (const c of modelCourses) {
-    const teacherId = getTeacherIdBySpecialtyKeyword(c.teacherKeyword);
-    const created = await prisma.course.create({
-      data: {
-        title: c.title,
-        price: c.price,
-        duration: c.duration,
-        hours: c.hours,
-        teacherId: teacherId,
-        status: "ACTIVE"
-      }
-    });
-    createdCourses[c.title] = created;
-  }
-
-  // Now, let's link the existing 15 students to these courses via Enrollment
-  const students = await prisma.student.findMany();
-  for (const student of students) {
-    const studentCourseName = student.course; // e.g. "Web Development (HTML/CSS)"
-    if (studentCourseName && createdCourses[studentCourseName]) {
-      const course = createdCourses[studentCourseName];
-      // Create enrollment
-      await prisma.enrollment.create({
-        data: {
-          studentId: student.id,
-          courseId: course.id,
-          status: "ENROLLED"
-        }
-      });
-    }
-  }
-
-  console.log("Seeding of 5 model courses and student enrollments completed!");
-}
+process.on('unhandledRejection', (reason, promise) => {});
 
 async function startServer() {
 
@@ -523,26 +175,8 @@ async function startServer() {
     await prisma.user.findFirst();
     console.log("Database connection is healthy.");
 
-    // Auto-seed 15 outstanding model students if database has 0 students
-    try {
-      await seed15ModelStudents();
-    } catch (err) {
-      console.error("Auto-seeding outstanding model students failed on startup:", err);
-    }
+    // Auto-seeding removed as per user request to delete sample data
 
-    // Auto-seed 5 outstanding model teachers if database has 0 teachers
-    try {
-      await seed5ModelTeachers();
-    } catch (err) {
-      console.error("Auto-seeding outstanding model teachers failed on startup:", err);
-    }
-
-    // Auto-seed 5 outstanding model courses if database has 0 courses
-    try {
-      await seed5ModelCourses();
-    } catch (err) {
-      console.error("Auto-seeding outstanding model courses failed on startup:", err);
-    }
 
     // Auto-migrate old mock teacher specialties to actual computer school specialties
     try {
@@ -654,6 +288,7 @@ async function startServer() {
       req.path.startsWith("/auth/forgot-password") ||
       req.path.startsWith("/auth/register") ||
       req.path === "/health" || 
+      req.path.startsWith("/public") || 
       req.path.startsWith("/portal/student") || 
       req.path.startsWith("/telegram/send") || 
       (req.path === "/system/settings" && req.method === "GET") ||
@@ -1021,11 +656,7 @@ async function startServer() {
       });
 
       if (samples.length === 0) {
-        samples = [
-          { studentId: "PLC-001", phone: "012345678", name: "សិស្ស (PLC-001)", email: "plc001@plc.edu.kh" },
-          { studentId: "PLC-002", phone: "098765432", name: "សិស្ស (PLC-002)", email: "plc002@plc.edu.kh" },
-          { studentId: "PLC-003", phone: "011223344", name: "សិស្ស (PLC-003)", email: "plc003@plc.edu.kh" }
-        ];
+        samples = [];
       }
 
       return res.json({ success: true, samples });
@@ -1033,11 +664,7 @@ async function startServer() {
       console.error("Failed to fetch sample students:", err);
       return res.json({
         success: true,
-        samples: [
-          { studentId: "PLC-001", phone: "012345678", name: "សិស្ស (PLC-001)", email: "plc001@plc.edu.kh" },
-          { studentId: "PLC-002", phone: "098765432", name: "សិស្ស (PLC-002)", email: "plc002@plc.edu.kh" },
-          { studentId: "PLC-003", phone: "011223344", name: "សិស្ស (PLC-003)", email: "plc003@plc.edu.kh" }
-        ]
+        samples: []
       });
     }
   });
@@ -3874,8 +3501,7 @@ app.post("/api/scores/seed", async (req, res) => {
   try {
     let students = await prisma.student.findMany();
     if (students.length === 0) {
-      await seed15ModelStudents();
-      students = await prisma.student.findMany();
+      return res.status(400).json({ error: "No students available to seed scores for" });
     }
 
     const months = ["2026-05", "2026-06", "2026-07"];
